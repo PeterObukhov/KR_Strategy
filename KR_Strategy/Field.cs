@@ -35,28 +35,32 @@ namespace KR_Strategy
             PointToHex(e.X, e.Y, out row, out col);
             if (player.playerBases[row, col] != null && player.playerUnits[row, col] != null)
             {
-                player.playerUnits[row, col].OnClick(player.playerUnits[row, col], pb, e, "Flat");
+                player.playerUnits[row, col].OnClick(player.playerUnits[row, col], pb, e, "Flat", player);
             }
             else if (player.playerBases[row, col] != null) player.playerBases[row, col].OnClick(field);
             else
             {
                 if (player.playerUnits[row, col] != null)
                 {
-                    player.playerUnits[row, col].OnClick(player.playerUnits[row, col], pb, e, "Flat");
+                    player.playerUnits[row, col].OnClick(player.playerUnits[row, col], pb, e, "Flat", player);
                 }
             }
         }
-        public void SetUnit(string unit, System.Drawing.Point coords, Player player)
+        public void SetUnit(string unit, int row, int col, Player player)
         {
             switch (unit)
             {
                 case "Base":
-                    baseTiles[coords.X, coords.Y] = new Base(coords, player);
-                    player.playerBases[coords.X, coords.Y] = new Base(coords, player);
+                    if(baseTiles[row, col] == null)
+                    {
+                        Base nb = new Base(row, col, player);
+                        player.playerBases[row, col] = nb;
+                        baseTiles[row, col] = nb;
+                    }
                     break;
                 case "Fighter": 
-                    unitTiles[coords.X, coords.Y] = new Fighter();
-                    player.playerUnits[coords.X, coords.Y] = new Fighter();
+                    unitTiles[row, col] = new Fighter();
+                    player.playerUnits[row, col] = new Fighter();
                     break;
             }
         }

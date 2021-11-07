@@ -21,7 +21,7 @@ namespace KR_Strategy
         }
         public virtual int CalcMove(string tile) { return move; }
         public virtual void Attack(Unit target, string tile) { }
-        public void OnClick(Unit unit, PictureBox pictureBox1, MouseEventArgs firstClick, string tile)
+        public void OnClick(Unit unit, PictureBox pictureBox1, MouseEventArgs firstClick, string tile, Player player)
         {
             UnitDialog ud = new UnitDialog();
             ud.ShowDialog();
@@ -57,9 +57,11 @@ namespace KR_Strategy
                                 int rowEnd, colEnd;
                                 Field.PointToHex(secondClick.Location.X, secondClick.Location.Y, out rowEnd, out colEnd);
                                 Field.unitTiles[rowEnd, colEnd] = unit;
+                                player.playerUnits[rowEnd, colEnd] = unit;
                                 int rowStart, colStart;
                                 Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out rowStart, out colStart);
                                 Field.unitTiles[rowStart, colStart] = null;
+                                player.playerUnits[rowStart, colStart] = null;
                             }
                             pictureBox1.MouseClick -= moveClickHandler;
                         }

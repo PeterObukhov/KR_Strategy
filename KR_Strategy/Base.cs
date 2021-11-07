@@ -12,9 +12,9 @@ namespace KR_Strategy
     {
         private static Player owner;
         private static Point coordinates;
-        public Base(Point coords, Player player)
+        public Base(int row, int col, Player player)
         {
-            coordinates = coords;
+            coordinates = new Point(row, col);
             owner = player;
         }
         public void OnClick(Field field)
@@ -37,7 +37,7 @@ namespace KR_Strategy
             {
                 case "Fighter":
                     Fighter fighter = new Fighter();
-                    field.SetUnit("Fighter", coordinates, owner);
+                    field.SetUnit("Fighter", coordinates.X, coordinates.Y, owner);
                     break;
             }
         }
