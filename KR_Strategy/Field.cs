@@ -5,6 +5,7 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Forms;
 
 namespace KR_Strategy
@@ -14,7 +15,7 @@ namespace KR_Strategy
         private static readonly float height = 80;
         private static int[,] tileTypes = new int[4, 9];
         private static int[,] baseTiles = new int[4, 9];
-        private static int[,] unitTiles = new int[4, 9];
+        private static Unit[,] unitTiles = new Unit[4, 9];
         private static List<PointF> Hexagons = new List<PointF>();
         Random rnd = new Random();
         public Field()
@@ -27,33 +28,32 @@ namespace KR_Strategy
                 }
             }
         }
-        public static void FieldClick(MouseEventArgs e)
+        public static void FieldClick(MouseEventArgs e, PictureBox pb)
         {
             int row;
             int col;
             PointToHex(e.X, e.Y, out row, out col);
-            Base.OnClick(new Point(row, col));
-            if (baseTiles[row, col] == 1 && unitTiles[row, col] != 0)
+            if (baseTiles[row, col] != 0 && unitTiles[row, col] != null)
             {
-                switch (unitTiles[row, col])
+                switch (unitTiles[row, col].GetType().Name)
                 {
-                    case 2:
-
+                    case "Fighter":
+                        Unit.OnClick("Fighter", pb, e);
                         break;
                 }
             }
-            else if (baseTiles[row, col] == 1) Base.OnClick(new Point(row, col));
+            else if (baseTiles[row, col] == 1) Base.OnClick(new System.Drawing.Point(row, col));
             else
             {
-                switch (unitTiles[row, col])
+                switch (unitTiles[row, col].GetType().Name)
                 {
-                    case 2:
+                    case "Fighter":
 
                         break;
                 }
             }
         }
-        public static void SetUnit(string unit, Point coords)
+        public static void SetUnit(string unit, System.Drawing.Point coords)
         {
             switch (unit)
             {
@@ -61,21 +61,21 @@ namespace KR_Strategy
                     baseTiles[coords.X, coords.Y] = 1;
                     break;
                 case "Fighter":
-                    unitTiles[coords.X, coords.Y] = 2;
+                    unitTiles[coords.X, coords.Y] = new Fighter();
                     break;
             }
         }
         public static void DrawUnits(Graphics gr)
         {
-            for(int i = 0; i < 4; i++)
+            for(int row = 0; row < 4; row++)
             {
-                for(int j = 0; j < 9; j++)
+                for(int col = 0; col < 9; col++)
                 {
-                    if(baseTiles[i, j] == 1) DrawImageInPolygon(gr, HexToPoints(i, j), Image.FromFile("base.png"));
-                    switch (unitTiles[i, j])
+                    if(baseTiles[row, col] == 1) DrawImageInPolygon(gr, HexToPoints(row, col), Image.FromFile("base.png"));
+                    switch (unitTiles[row, col].GetType().Name)
                     {
-                        case 2:
-                            DrawImageInPolygon(gr, HexToPoints(i, j), Image.FromFile("fighter.png"));
+                        case "Fighter":
+                            DrawImageInPolygon(gr, HexToPoints(row, col), Image.FromFile("fighter.png"));
                             break;
                     }
                 }
@@ -252,6 +252,11 @@ namespace KR_Strategy
                 if (col % 2 != 0) row++;
                 col--;
             }
+        }
+        public static double GetDistance(System.Drawing.Point start, System.Drawing.Point end)
+        {
+            Vector vect = new Vector(end.X - start.X, end.Y - start.Y);
+            return vect.Length;
         }
     }
 }

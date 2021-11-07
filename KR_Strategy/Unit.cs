@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace KR_Strategy
 {
@@ -19,6 +20,28 @@ namespace KR_Strategy
         }
         public virtual int CalcMove(ITile tile) { return move; }
         public virtual void Attack(Unit target, ITile tile) { }
+        public static void OnClick(string unit, PictureBox pictureBox1, MouseEventArgs firstClick)
+        {
+            UnitDialog ud = new UnitDialog();
+            ud.ShowDialog();
+            string dialogRes = ud.ans;
+            switch (dialogRes)
+            {
+                case "Attack":
+                    pictureBox1.MouseClick += (sender, secondClick) =>
+                    {
+                        double dist = Field.GetDistance(firstClick.Location, secondClick.Location);
+                        if (dist <= 1)
+                        {
+
+                        }
+                    };
+                    break;
+                case "Move":
+
+                    break;
+            }
+        }
     }
    
     class AirUnit : Unit

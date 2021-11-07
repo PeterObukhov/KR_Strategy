@@ -70,7 +70,7 @@ namespace KR_Strategy
 
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
         {
-            Field.FieldClick(e);
+            Field.FieldClick(e, pictureBox1);
             pictureBox1.Invalidate();
         }
     }
