@@ -6,35 +6,31 @@ using System.Threading.Tasks;
 
 namespace KR_Strategy
 {
-    interface ITile
+    class Flat
     {
 
     }
-    class Flat : ITile
+    class Forest
     {
 
     }
-    class Forest : ITile
+    class Mountain
     {
 
     }
-    class Mountain : ITile
+    class Desert
     {
 
     }
-    class Desert : ITile
+    class Swamp
     {
 
     }
-    class Swamp : ITile
+    class River
     {
 
     }
-    class River : ITile
-    {
-
-    }
-    class Sea : ITile
+    class Sea
     {
 
     }

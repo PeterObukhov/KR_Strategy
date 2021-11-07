@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -18,9 +19,9 @@ namespace KR_Strategy
             health = hp;
             move = mv;
         }
-        public virtual int CalcMove(ITile tile) { return move; }
-        public virtual void Attack(Unit target, ITile tile) { }
-        public static void OnClick(string unit, PictureBox pictureBox1, MouseEventArgs firstClick)
+        public virtual int CalcMove(string tile) { return move; }
+        public virtual void Attack(Unit target, string tile) { }
+        public void OnClick(Unit unit, PictureBox pictureBox1, MouseEventArgs firstClick, string tile)
         {
             UnitDialog ud = new UnitDialog();
             ud.ShowDialog();
@@ -28,17 +29,39 @@ namespace KR_Strategy
             switch (dialogRes)
             {
                 case "Attack":
-                    pictureBox1.MouseClick += (sender, secondClick) =>
+                    MouseEventHandler attackClickHandler = null;
+                    attackClickHandler = delegate (object sender, MouseEventArgs secondClick)
                     {
                         double dist = Field.GetDistance(firstClick.Location, secondClick.Location);
                         if (dist <= 1)
                         {
-
+                            int row, col;
+                            Field.PointToHex(secondClick.Location.X, secondClick.Location.Y, out row, out col);
+                            Unit target = Field.unitTiles[row, col];
+                            Attack(target, tile);
                         }
+                        pictureBox1.MouseClick -= attackClickHandler;
                     };
+                    pictureBox1.MouseClick += attackClickHandler;
                     break;
                 case "Move":
-
+                    int mv = CalcMove("Flat");
+                    MouseEventHandler moveClickHandler = null;
+                    moveClickHandler = delegate (object sender, MouseEventArgs secondClick)
+                    {
+                        double dist = Field.GetDistance(firstClick.Location, secondClick.Location);
+                        if (dist <= mv)
+                        {
+                            int rowEnd, colEnd;
+                            Field.PointToHex(secondClick.Location.X, secondClick.Location.Y, out rowEnd, out colEnd);
+                            Field.unitTiles[rowEnd, colEnd] = unit;
+                            int rowStart, colStart;
+                            Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out rowStart, out colStart);
+                            Field.unitTiles[rowStart, colStart] = null;
+                        }
+                        pictureBox1.MouseClick -= moveClickHandler;
+                    };
+                    pictureBox1.MouseClick += moveClickHandler;
                     break;
             }
         }
@@ -55,7 +78,7 @@ namespace KR_Strategy
             health = hp;
             move = mv;
         }
-        public override void Attack(Unit target, ITile tile)
+        public override void Attack(Unit target, string tile)
         {
             double tempDamage = damage;
             if (groundUnits.Contains<string>(target.GetType().Name) || waterUnits.Contains<string>(target.GetType().Name)) tempDamage += 10;
@@ -64,7 +87,7 @@ namespace KR_Strategy
             target.health -= tempDamage;
         }
 
-        public override int CalcMove(ITile tile)
+        public override int CalcMove(string tile)
         {
             if (tile.GetType().Name == "Flat") return move + 1;
             if (tile.GetType().Name == "Mountain") return move - 1;
@@ -110,7 +133,7 @@ namespace KR_Strategy
         private string[] groundUnits = new string[3] { "Car", "Tank", "RocketLauncher" };
         private string[] waterUnits = new string[2] { "Ship", "Boat" };
         private string[] airUnits = new string[3] { "Fighter", "Cruiser", "Drone" };
-        public override void Attack(Unit target, ITile tile)
+        public override void Attack(Unit target, string tile)
         {
             double tempDamage = damage;
             if (airUnits.Contains<string>(target.GetType().Name)) tempDamage += 10;
@@ -118,7 +141,7 @@ namespace KR_Strategy
             target.health -= tempDamage;
         }
 
-        public override int CalcMove(ITile tile)
+        public override int CalcMove(string tile)
         {
             if (tile.GetType().Name == "Flat") return move + 1;
             if (tile.GetType().Name == "Mountain" || tile.GetType().Name == "Forest") return move - 1;
@@ -165,7 +188,7 @@ namespace KR_Strategy
         private string[] groundUnits = new string[3] { "Car", "Tank", "RocketLauncher" };
         private string[] waterUnits = new string[2] { "Ship", "Boat" };
         private string[] airUnits = new string[3] { "Fighter", "Cruiser", "Drone" };
-        public override void Attack(Unit target, ITile tile)
+        public override void Attack(Unit target, string tile)
         {
             double tempDamage = damage;
             if (groundUnits.Contains<string>(target.GetType().Name)) tempDamage += 10;
@@ -174,7 +197,7 @@ namespace KR_Strategy
             target.health -= tempDamage;
         }
 
-        public override int CalcMove(ITile tile)
+        public override int CalcMove(string tile)
         {
             return move;
         }

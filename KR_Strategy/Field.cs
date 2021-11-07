@@ -15,7 +15,7 @@ namespace KR_Strategy
         private static readonly float height = 80;
         private static int[,] tileTypes = new int[4, 9];
         private static int[,] baseTiles = new int[4, 9];
-        private static Unit[,] unitTiles = new Unit[4, 9];
+        public static Unit[,] unitTiles = new Unit[4, 9];
         private static List<PointF> Hexagons = new List<PointF>();
         Random rnd = new Random();
         public Field()
@@ -35,21 +35,14 @@ namespace KR_Strategy
             PointToHex(e.X, e.Y, out row, out col);
             if (baseTiles[row, col] != 0 && unitTiles[row, col] != null)
             {
-                switch (unitTiles[row, col].GetType().Name)
-                {
-                    case "Fighter":
-                        Unit.OnClick("Fighter", pb, e);
-                        break;
-                }
+                unitTiles[row, col].OnClick(unitTiles[row, col], pb, e, "Flat");
             }
             else if (baseTiles[row, col] == 1) Base.OnClick(new System.Drawing.Point(row, col));
             else
             {
-                switch (unitTiles[row, col].GetType().Name)
+                if (unitTiles[row, col] != null)
                 {
-                    case "Fighter":
-
-                        break;
+                    unitTiles[row, col].OnClick(unitTiles[row, col], pb, e, "Flat");
                 }
             }
         }
@@ -72,11 +65,14 @@ namespace KR_Strategy
                 for(int col = 0; col < 9; col++)
                 {
                     if(baseTiles[row, col] == 1) DrawImageInPolygon(gr, HexToPoints(row, col), Image.FromFile("base.png"));
-                    switch (unitTiles[row, col].GetType().Name)
+                    if (unitTiles[row, col] != null)
                     {
-                        case "Fighter":
-                            DrawImageInPolygon(gr, HexToPoints(row, col), Image.FromFile("fighter.png"));
-                            break;
+                        switch (unitTiles[row, col].GetType().Name)
+                        {
+                            case "Fighter":
+                                DrawImageInPolygon(gr, HexToPoints(row, col), Image.FromFile("fighter.png"));
+                                break;
+                        }
                     }
                 }
             }
@@ -200,7 +196,7 @@ namespace KR_Strategy
             gr.DrawImage(image, dest_points, src_rect, GraphicsUnit.Pixel);
             gr.Restore(state);
         }
-        private static void PointToHex(float x, float y, out int row, out int col)
+        public static void PointToHex(float x, float y, out int row, out int col)
         {
             // Find the test rectangle containing the point.
             float width = HexWidth();
@@ -255,7 +251,10 @@ namespace KR_Strategy
         }
         public static double GetDistance(System.Drawing.Point start, System.Drawing.Point end)
         {
-            Vector vect = new Vector(end.X - start.X, end.Y - start.Y);
+            int startRow, startCol, endRow, endCol;
+            PointToHex(start.X, start.Y, out startRow, out startCol);
+            PointToHex(end.X, end.Y, out endRow, out endCol);
+            Vector vect = new Vector(endCol - startCol, endRow - startRow);
             return vect.Length;
         }
     }
