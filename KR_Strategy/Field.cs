@@ -32,12 +32,25 @@ namespace KR_Strategy
             int row;
             int col;
             PointToHex(e.X, e.Y, out row, out col);
-            if (baseTiles[row, col] == 1) Base.OnClick(new Point(row, col));
-            switch(unitTiles[row, col])
+            Base.OnClick(new Point(row, col));
+            if (baseTiles[row, col] == 1 && unitTiles[row, col] != 0)
             {
-                case 2:
-                    
-                    break;
+                switch (unitTiles[row, col])
+                {
+                    case 2:
+
+                        break;
+                }
+            }
+            else if (baseTiles[row, col] == 1) Base.OnClick(new Point(row, col));
+            else
+            {
+                switch (unitTiles[row, col])
+                {
+                    case 2:
+
+                        break;
+                }
             }
         }
         public static void SetUnit(string unit, Point coords)
