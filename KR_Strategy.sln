@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30517.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KR_Strategy", "KR_Strategy\KR_Strategy.csproj", "{B26CC113-6A4D-43E7-9D28-3A168F4026C5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B26CC113-6A4D-43E7-9D28-3A168F4026C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B26CC113-6A4D-43E7-9D28-3A168F4026C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B26CC113-6A4D-43E7-9D28-3A168F4026C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B26CC113-6A4D-43E7-9D28-3A168F4026C5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FB9530D9-5EEF-48B3-9CDC-E78BA377AD8C}
+	EndGlobalSection
+EndGlobal
