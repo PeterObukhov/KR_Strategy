@@ -14,47 +14,49 @@ namespace KR_Strategy
     {
         private static readonly float height = 80;
         private static int[,] tileTypes = new int[4, 9];
-        private static int[,] baseTiles = new int[4, 9];
+        public static Base[,] baseTiles = new Base[4, 9];
         public static Unit[,] unitTiles = new Unit[4, 9];
         private static List<PointF> Hexagons = new List<PointF>();
         Random rnd = new Random();
-        public Field()
+        public void CreateField()
         {
-            for(int i = 0; i < 4; i++)
+            for (int i = 0; i < 4; i++)
             {
-                for(int j = 0; j < 9; j++)
+                for (int j = 0; j < 9; j++)
                 {
                     tileTypes[i, j] = rnd.Next(0, 5);
                 }
             }
         }
-        public static void FieldClick(MouseEventArgs e, PictureBox pb)
+        public static void FieldClick(MouseEventArgs e, PictureBox pb, Player player, Field field)
         {
             int row;
             int col;
             PointToHex(e.X, e.Y, out row, out col);
-            if (baseTiles[row, col] != 0 && unitTiles[row, col] != null)
+            if (player.playerBases[row, col] != null && player.playerUnits[row, col] != null)
             {
-                unitTiles[row, col].OnClick(unitTiles[row, col], pb, e, "Flat");
+                player.playerUnits[row, col].OnClick(player.playerUnits[row, col], pb, e, "Flat");
             }
-            else if (baseTiles[row, col] == 1) Base.OnClick(new System.Drawing.Point(row, col));
+            else if (player.playerBases[row, col] != null) player.playerBases[row, col].OnClick(field);
             else
             {
-                if (unitTiles[row, col] != null)
+                if (player.playerUnits[row, col] != null)
                 {
-                    unitTiles[row, col].OnClick(unitTiles[row, col], pb, e, "Flat");
+                    player.playerUnits[row, col].OnClick(player.playerUnits[row, col], pb, e, "Flat");
                 }
             }
         }
-        public static void SetUnit(string unit, System.Drawing.Point coords)
+        public void SetUnit(string unit, System.Drawing.Point coords, Player player)
         {
             switch (unit)
             {
                 case "Base":
-                    baseTiles[coords.X, coords.Y] = 1;
+                    baseTiles[coords.X, coords.Y] = new Base(coords, player);
+                    player.playerBases[coords.X, coords.Y] = new Base(coords, player);
                     break;
-                case "Fighter":
+                case "Fighter": 
                     unitTiles[coords.X, coords.Y] = new Fighter();
+                    player.playerUnits[coords.X, coords.Y] = new Fighter();
                     break;
             }
         }
@@ -64,7 +66,7 @@ namespace KR_Strategy
             {
                 for(int col = 0; col < 9; col++)
                 {
-                    if(baseTiles[row, col] == 1) DrawImageInPolygon(gr, HexToPoints(row, col), Image.FromFile("base.png"));
+                    if(baseTiles[row, col] != null) DrawImageInPolygon(gr, HexToPoints(row, col), Image.FromFile("base.png"));
                     if (unitTiles[row, col] != null)
                     {
                         switch (unitTiles[row, col].GetType().Name)

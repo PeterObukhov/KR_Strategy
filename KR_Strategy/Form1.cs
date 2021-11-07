@@ -12,6 +12,10 @@ namespace KR_Strategy
 {
     public partial class Form1 : Form
     {
+        static Player player1 = new Player();
+        static Player player2 = new Player();
+        static int count = 0;
+        static Field field = new Field();
         public Form1()
         {
             InitializeComponent();
@@ -55,7 +59,7 @@ namespace KR_Strategy
             comboBox2.Visible = false;
             label2.Visible = false;
             pictureBox1.Visible = true;
-            Field field = new Field();
+            field.CreateField();
         }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
@@ -63,15 +67,26 @@ namespace KR_Strategy
             Graphics graphics = e.Graphics;
             Pen pen = new Pen(Color.Black, 3);
             Field.DrawHexGrid(graphics, pen, 0, pictureBox1.ClientSize.Width, 0, pictureBox1.ClientSize.Height, 80);
-            Field.SetUnit("Base", new Point(0, 0));
-            Base base1 = new Base(new Point(0, 0));
+            field.SetUnit("Base", new Point(0, 0), player1);
+            field.SetUnit("Base", new Point(3, 8), player2);
             Field.DrawUnits(graphics);
         }
 
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
         {
-            Field.FieldClick(e, pictureBox1);
+            if(count % 2 == 0) Field.FieldClick(e, pictureBox1, player1, field);
+            else Field.FieldClick(e, pictureBox1, player2, field);
             pictureBox1.Invalidate();
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            count += 1;
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            count += 1;
         }
     }
 }

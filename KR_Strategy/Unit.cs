@@ -49,17 +49,21 @@ namespace KR_Strategy
                     MouseEventHandler moveClickHandler = null;
                     moveClickHandler = delegate (object sender, MouseEventArgs secondClick)
                     {
-                        double dist = Field.GetDistance(firstClick.Location, secondClick.Location);
-                        if (dist <= mv)
+                        try
                         {
-                            int rowEnd, colEnd;
-                            Field.PointToHex(secondClick.Location.X, secondClick.Location.Y, out rowEnd, out colEnd);
-                            Field.unitTiles[rowEnd, colEnd] = unit;
-                            int rowStart, colStart;
-                            Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out rowStart, out colStart);
-                            Field.unitTiles[rowStart, colStart] = null;
+                            double dist = Field.GetDistance(firstClick.Location, secondClick.Location);
+                            if (dist <= mv)
+                            {
+                                int rowEnd, colEnd;
+                                Field.PointToHex(secondClick.Location.X, secondClick.Location.Y, out rowEnd, out colEnd);
+                                Field.unitTiles[rowEnd, colEnd] = unit;
+                                int rowStart, colStart;
+                                Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out rowStart, out colStart);
+                                Field.unitTiles[rowStart, colStart] = null;
+                            }
+                            pictureBox1.MouseClick -= moveClickHandler;
                         }
-                        pictureBox1.MouseClick -= moveClickHandler;
+                        catch { }
                     };
                     pictureBox1.MouseClick += moveClickHandler;
                     break;
