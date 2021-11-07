@@ -10,14 +10,7 @@ namespace KR_Strategy
 {
     class Base
     {
-        private static Player owner;
-        private static Point coordinates;
-        public Base(int row, int col, Player player)
-        {
-            coordinates = new Point(row, col);
-            owner = player;
-        }
-        public void OnClick(Field field)
+        public void OnClick(Field field, Point coordinates, Player player)
         {
             BaseDialog bd = new BaseDialog();
             bd.ShowDialog();
@@ -25,19 +18,18 @@ namespace KR_Strategy
             switch (dialAns)
             {
                 case "Fighter":
-                    CreateUnit("Fighter", field);
+                    CreateUnit("Fighter", field, coordinates, player);
                     break;
                 case "Close":
                     break;
             }
         }
-        private static void CreateUnit(string unit, Field field)
+        private static void CreateUnit(string unit, Field field, Point coordinates, Player player)
         {
             switch(unit)
             {
                 case "Fighter":
-                    Fighter fighter = new Fighter();
-                    field.SetUnit("Fighter", coordinates.X, coordinates.Y, owner);
+                    field.SetUnit("Fighter", coordinates.X, coordinates.Y, player);
                     break;
             }
         }

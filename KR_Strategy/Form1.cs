@@ -68,6 +68,7 @@ namespace KR_Strategy
             Pen pen = new Pen(Color.Black, 3);
             Field.DrawHexGrid(graphics, pen, 0, pictureBox1.ClientSize.Width, 0, pictureBox1.ClientSize.Height, 80);
             field.SetUnit("Base", 0, 0, player1);
+            field.SetUnit("Base", 3, 8, player2);
             Field.DrawUnits(graphics);
         }
 

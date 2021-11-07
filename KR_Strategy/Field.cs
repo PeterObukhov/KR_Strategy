@@ -37,7 +37,7 @@ namespace KR_Strategy
             {
                 player.playerUnits[row, col].OnClick(player.playerUnits[row, col], pb, e, "Flat", player);
             }
-            else if (player.playerBases[row, col] != null) player.playerBases[row, col].OnClick(field);
+            else if (player.playerBases[row, col] != null) player.playerBases[row, col].OnClick(field, new System.Drawing.Point(row, col), player);
             else
             {
                 if (player.playerUnits[row, col] != null)
@@ -53,7 +53,7 @@ namespace KR_Strategy
                 case "Base":
                     if(baseTiles[row, col] == null)
                     {
-                        Base nb = new Base(row, col, player);
+                        Base nb = new Base();
                         player.playerBases[row, col] = nb;
                         baseTiles[row, col] = nb;
                     }
