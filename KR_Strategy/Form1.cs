@@ -59,6 +59,8 @@ namespace KR_Strategy
             comboBox2.Visible = false;
             label2.Visible = false;
             pictureBox1.Visible = true;
+            Field.SetUnit(new Base(), 0, 0, player1);
+            Field.SetUnit(new Base(), 3, 8, player2);
             field.CreateField();
         }
 
@@ -66,16 +68,18 @@ namespace KR_Strategy
         {
             Graphics graphics = e.Graphics;
             Pen pen = new Pen(Color.Black, 3);
+            label4.Text = player1.mineralsAmount.ToString();
+            label6.Text = player1.gasAmount.ToString();
+            label8.Text = player2.mineralsAmount.ToString();
+            label10.Text = player2.gasAmount.ToString();
             Field.DrawHexGrid(graphics, pen, 0, pictureBox1.ClientSize.Width, 0, pictureBox1.ClientSize.Height, 80);
-            field.SetUnit("Base", 0, 0, player1);
-            field.SetUnit("Base", 3, 8, player2);
             Field.DrawUnits(graphics);
         }
 
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
         {
-            if(count % 2 == 0) Field.FieldClick(e, pictureBox1, player1, field);
-            else Field.FieldClick(e, pictureBox1, player2, field);
+            if(count % 2 == 0) Field.FieldClick(e, pictureBox1, player1, field, player2);
+            else Field.FieldClick(e, pictureBox1, player2, field, player2);
             pictureBox1.Invalidate();
         }
 

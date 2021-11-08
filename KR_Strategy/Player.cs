@@ -8,6 +8,8 @@ namespace KR_Strategy
 {
     class Player
     {
+        public int gasAmount = 800;
+        public int mineralsAmount = 600;
         public Unit[,] playerUnits = new Unit[4, 9];
         public Base[,] playerBases = new Base[4, 9];
     }

@@ -8,9 +8,16 @@ using System.Windows.Forms;
 
 namespace KR_Strategy
 {
-    class Base
+    class Base : Unit
     {
-        public void OnClick(Field field, Point coordinates, Player player)
+        public double hp;
+        public int costGas = 700;
+        public int costMinerals = 500;
+        public Base(double dmg = 0, double hp = 200, int mv = 0, int cg = 0, int cm = 0) : base(dmg, hp, mv, cg, cm)
+        {
+            this.hp = hp;
+        }
+        public void OnClick(Point coordinates, Player player)
         {
             BaseDialog bd = new BaseDialog();
             bd.ShowDialog();
@@ -18,18 +25,14 @@ namespace KR_Strategy
             switch (dialAns)
             {
                 case "Fighter":
-                    CreateUnit("Fighter", field, coordinates, player);
-                    break;
-                case "Close":
-                    break;
-            }
-        }
-        private static void CreateUnit(string unit, Field field, Point coordinates, Player player)
-        {
-            switch(unit)
-            {
-                case "Fighter":
-                    field.SetUnit("Fighter", coordinates.X, coordinates.Y, player);
+                    Fighter nf = new Fighter();
+                    if (nf.costMinerals <= player.mineralsAmount && nf.costGas <= player.gasAmount)
+                    {
+                        Field.SetUnit(new Fighter(), coordinates.X, coordinates.Y, player);
+                        player.mineralsAmount -= nf.costMinerals;
+                        player.gasAmount -= nf.costGas;
+                    }
+                    else MessageBox.Show("Недостаточно материалов!");
                     break;
             }
         }

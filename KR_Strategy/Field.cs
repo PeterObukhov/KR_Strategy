@@ -14,6 +14,7 @@ namespace KR_Strategy
     {
         private static readonly float height = 80;
         private static int[,] tileTypes = new int[4, 9];
+        public static int[,] resourceTiles = new int[4, 9];
         public static Base[,] baseTiles = new Base[4, 9];
         public static Unit[,] unitTiles = new Unit[4, 9];
         private static List<PointF> Hexagons = new List<PointF>();
@@ -27,40 +28,58 @@ namespace KR_Strategy
                     tileTypes[i, j] = rnd.Next(0, 5);
                 }
             }
-        }
-        public static void FieldClick(MouseEventArgs e, PictureBox pb, Player player, Field field)
-        {
-            int row;
-            int col;
-            PointToHex(e.X, e.Y, out row, out col);
-            if (player.playerBases[row, col] != null && player.playerUnits[row, col] != null)
+            for (int i = 0; i < 5; i++)
             {
-                player.playerUnits[row, col].OnClick(player.playerUnits[row, col], pb, e, "Flat", player);
+                int row = rnd.Next(0, 4);
+                int col = rnd.Next(0, 8);
+                if (baseTiles[row, col] == null && resourceTiles[row, col] == 0) resourceTiles[row, col] = 1;
+                else i -= 1;
             }
-            else if (player.playerBases[row, col] != null) player.playerBases[row, col].OnClick(field, new System.Drawing.Point(row, col), player);
+            for (int i = 0; i < 3; i++)
+            {
+                int row = rnd.Next(0, 4);
+                int col = rnd.Next(0, 8);
+                if (baseTiles[row, col] == null && resourceTiles[row, col] == 0) resourceTiles[row, col] = 2;
+                else i -= 1;
+            }
+        }
+        public static void FieldClick(MouseEventArgs e, PictureBox pb, Player player1, Field field, Player player2)
+        {
+            PointToHex(e.X, e.Y, out int row, out int col);
+            if (player1.playerBases[row, col] != null && player1.playerUnits[row, col] != null)
+            {
+                player1.playerUnits[row, col].OnClick(player1.playerUnits[row, col], pb, e, "Flat", player1, player2);
+            }
+            else if (player1.playerBases[row, col] != null) player1.playerBases[row, col].OnClick(new System.Drawing.Point(row, col), player1);
             else
             {
-                if (player.playerUnits[row, col] != null)
+                if (player1.playerUnits[row, col] != null)
                 {
-                    player.playerUnits[row, col].OnClick(player.playerUnits[row, col], pb, e, "Flat", player);
+                    player1.playerUnits[row, col].OnClick(player1.playerUnits[row, col], pb, e, "Flat", player1, player2);
                 }
             }
         }
-        public void SetUnit(string unit, int row, int col, Player player)
+        public static void SetUnit(Unit unit, int row, int col, Player player)
         {
-            switch (unit)
+            switch (unit.GetType().Name)
             {
                 case "Base":
                     if(baseTiles[row, col] == null)
                     {
                         Base nb = new Base();
-                        player.playerBases[row, col] = nb;
-                        baseTiles[row, col] = nb;
+                        if (player.gasAmount >= nb.costGas && player.mineralsAmount >= nb.costMinerals)
+                        {
+                            player.playerBases[row, col] = nb;
+                            baseTiles[row, col] = nb;
+                            player.gasAmount -= nb.costGas;
+                            player.mineralsAmount -= nb.costMinerals;
+                        }
+                        else MessageBox.Show("Недостаточно ресурсов!");
                     }
                     break;
-                case "Fighter": 
-                    unitTiles[row, col] = new Fighter();
-                    player.playerUnits[row, col] = new Fighter();
+                default:
+                    unitTiles[row, col] = unit;
+                    player.playerUnits[row, col] = unit;
                     break;
             }
         }
@@ -132,6 +151,15 @@ namespace KR_Strategy
                     break;
                 case 4:
                     gr.FillPolygon(Brushes.Orange, HexToPoints(row, col));
+                    break;
+            }
+            switch (resourceTiles[row, col])
+            {
+                case 1:
+                    DrawImageInPolygon(gr, HexToPoints(row, col), Image.FromFile("gas.png"));
+                    break;
+                case 2:
+                    DrawImageInPolygon(gr, HexToPoints(row, col), Image.FromFile("mineral.png"));
                     break;
             }
         }

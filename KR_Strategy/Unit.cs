@@ -13,15 +13,19 @@ namespace KR_Strategy
         public double damage { get; set; }
         public int move { get; set; }
         public double health { get; set; }
-        public Unit(double dmg, double hp, int mv)
+        public int costGas { get; set; }
+        public int costMinerals { get; set; }
+        public Unit(double dmg, double hp, int mv, int cg, int cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
+            costGas = cg;
+            costMinerals = cm;
         }
         public virtual int CalcMove(string tile) { return move; }
         public virtual void Attack(Unit target, string tile) { }
-        public void OnClick(Unit unit, PictureBox pictureBox1, MouseEventArgs firstClick, string tile, Player player)
+        public void OnClick(Unit unit, PictureBox pictureBox1, MouseEventArgs firstClick, string tile, Player attacker, Player defender)
         {
             UnitDialog ud = new UnitDialog();
             ud.ShowDialog();
@@ -35,15 +39,33 @@ namespace KR_Strategy
                         double dist = Field.GetDistance(firstClick.Location, secondClick.Location);
                         if (dist <= 1)
                         {
-                            int row, col;
-                            Field.PointToHex(secondClick.Location.X, secondClick.Location.Y, out row, out col);
-                            Unit target = Field.unitTiles[row, col];
-                            Attack(target, tile);
+                            Field.PointToHex(secondClick.Location.X, secondClick.Location.Y, out int row, out int col);
+                            if(Field.unitTiles[row, col] != null)
+                            {
+                                Unit target = Field.unitTiles[row, col];
+                                Attack(target, tile);
+                                if (target.health <= 0)
+                                {
+                                    Field.unitTiles[row, col] = null;
+                                    defender.playerUnits[row, col] = null;
+                                }
+                            }
+                            else if (Field.baseTiles[row, col] != null)
+                            {
+                                Unit target = Field.baseTiles[row, col];
+                                Attack(target, tile);
+                                if (target.health <= 0)
+                                {
+                                    Field.baseTiles[row, col] = null;
+                                    defender.playerBases[row, col] = null;
+                                }
+                            }
                         }
                         pictureBox1.MouseClick -= attackClickHandler;
                     };
                     pictureBox1.MouseClick += attackClickHandler;
                     break;
+
                 case "Move":
                     int mv = CalcMove("Flat");
                     MouseEventHandler moveClickHandler = null;
@@ -54,20 +76,33 @@ namespace KR_Strategy
                             double dist = Field.GetDistance(firstClick.Location, secondClick.Location);
                             if (dist <= mv)
                             {
-                                int rowEnd, colEnd;
-                                Field.PointToHex(secondClick.Location.X, secondClick.Location.Y, out rowEnd, out colEnd);
+                                Field.PointToHex(secondClick.Location.X, secondClick.Location.Y, out int rowEnd, out int colEnd);
                                 Field.unitTiles[rowEnd, colEnd] = unit;
-                                player.playerUnits[rowEnd, colEnd] = unit;
-                                int rowStart, colStart;
-                                Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out rowStart, out colStart);
+                                attacker.playerUnits[rowEnd, colEnd] = unit;
+                                Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int rowStart, out int colStart);
                                 Field.unitTiles[rowStart, colStart] = null;
-                                player.playerUnits[rowStart, colStart] = null;
+                                attacker.playerUnits[rowStart, colStart] = null;
                             }
                             pictureBox1.MouseClick -= moveClickHandler;
                         }
                         catch { }
                     };
                     pictureBox1.MouseClick += moveClickHandler;
+                    break;
+
+                case "Dig":
+                    Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int unitRow, out int unitCol);
+                    if(Field.resourceTiles[unitRow, unitCol] == 1) attacker.gasAmount += 100;
+                    if (Field.resourceTiles[unitRow, unitCol] == 2) attacker.mineralsAmount += 100;
+                    break;
+
+                case "Build":
+                    Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int currRow, out int currCol);
+                    if (Field.resourceTiles[currRow, currCol] == 0 && Field.baseTiles[currRow, currCol] == null)
+                    {
+                        Field.SetUnit(new Base(), currRow, currCol, attacker);
+                    }
+                    else MessageBox.Show("Невозможно поставить базу");
                     break;
             }
         }
@@ -78,11 +113,13 @@ namespace KR_Strategy
         private string[] groundUnits = new string[3] { "Car", "Tank", "RocketLauncher" };
         private string[] waterUnits = new string[2] { "Ship", "Boat" };
         private string[] airUnits = new string[3] { "Fighter", "Cruiser", "Drone" };
-        public AirUnit(double dmg, double hp, int mv) : base(dmg, hp, mv)
+        public AirUnit(double dmg, double hp, int mv, int cg, int cm) : base(dmg, hp, mv, cg, cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
+            costGas = cg;
+            costMinerals = cm;
         }
         public override void Attack(Unit target, string tile)
         {
@@ -102,39 +139,47 @@ namespace KR_Strategy
     }
     class Fighter : AirUnit
     {
-        public Fighter(double dmg = 10, double hp = 100, int mv = 5) : base(dmg, hp, mv)
+        public Fighter(double dmg = 10, double hp = 100, int mv = 5, int cg = 50, int cm = 20) : base(dmg, hp, mv, cg, cm)
         {
-            damage = 10;
+            damage = 50;
             health = 100;
             move = 5;
+            costGas = 50;
+            costMinerals = 20;
         }
     }
     class Cruiser : AirUnit
     {
-        public Cruiser(double dmg = 20, double hp = 150, int mv = 2) : base(dmg, hp, mv)
+        public Cruiser(double dmg = 20, double hp = 150, int mv = 2, int cg = 150, int cm = 100) : base(dmg, hp, mv, cg, cm)
         {
-            damage = dmg;
-            health = hp;
-            move = mv;
+            damage = 20;
+            health = 150;
+            move = 2;
+            costGas = 150;
+            costMinerals = 100;
         }
     }
     class Drone : AirUnit
     {
-        public Drone(double dmg = 10, double hp = 50, int mv = 3) : base(dmg, hp, mv)
+        public Drone(double dmg = 10, double hp = 50, int mv = 3, int cg = 40, int cm = 10) : base(dmg, hp, mv, cg, cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
+            costGas = cg;
+            costMinerals = cm;
         }
     }
 
     class GroundUnit : Unit
     {
-        public GroundUnit(double dmg, double hp, int mv) : base(dmg, hp, mv)
+        public GroundUnit(double dmg, double hp, int mv, int cg, int cm) : base(dmg, hp, mv, cg, cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
+            costGas = cg;
+            costMinerals = cm;
         }
         private string[] groundUnits = new string[3] { "Car", "Tank", "RocketLauncher" };
         private string[] waterUnits = new string[2] { "Ship", "Boat" };
@@ -158,38 +203,46 @@ namespace KR_Strategy
     }
     class Tank : GroundUnit
     {
-        public Tank(double dmg = 20, double hp = 200, int mv = 3) : base(dmg, hp, mv)
+        public Tank(double dmg = 20, double hp = 200, int mv = 3, int cg = 200, int cm = 100) : base(dmg, hp, mv, cg, cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
+            costGas = cg;
+            costMinerals = cm;
         }
     }
     class Car : GroundUnit
     {
-        public Car(double dmg = 5, double hp = 50, int mv = 4) : base(dmg, hp, mv)
+        public Car(double dmg = 5, double hp = 50, int mv = 4, int cg = 70, int cm = 10) : base(dmg, hp, mv, cg, cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
+            costGas = cg;
+            costMinerals = cm;
         }
     }
     class RocketLauncher : GroundUnit
     {
-        public RocketLauncher(double dmg = 150, double hp = 50, int mv = 2) : base(dmg, hp, mv)
+        public RocketLauncher(double dmg = 150, double hp = 50, int mv = 2, int cg = 150, int cm = 100) : base(dmg, hp, mv, cg, cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
+            costGas = cg;
+            costMinerals = cm;
         }
     }
     class WaterUnit : Unit
     {
-        public WaterUnit(double dmg, double hp, int mv) : base(dmg, hp, mv)
+        public WaterUnit(double dmg, double hp, int mv, int cg, int cm) : base(dmg, hp, mv, cg, cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
+            costGas = cg;
+            costMinerals = cm;
         }
         private string[] groundUnits = new string[3] { "Car", "Tank", "RocketLauncher" };
         private string[] waterUnits = new string[2] { "Ship", "Boat" };
@@ -210,20 +263,24 @@ namespace KR_Strategy
     }
     class Boat : WaterUnit
     {
-        public Boat(double dmg = 100, double hp = 100, int mv = 4) : base(dmg, hp, mv)
+        public Boat(double dmg = 100, double hp = 100, int mv = 4, int cg = 70, int cm = 10) : base(dmg, hp, mv, cg, cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
+            costGas = cg;
+            costMinerals = cm;
         }
     }
     class Ship : WaterUnit
     {
-        public Ship(double dmg = 200, double hp = 200, int mv = 3) : base(dmg, hp, mv)
+        public Ship(double dmg = 200, double hp = 200, int mv = 3, int cg = 200, int cm = 150) : base(dmg, hp, mv, cg, cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
+            costGas = cg;
+            costMinerals = cm;
         }
     }
 }
