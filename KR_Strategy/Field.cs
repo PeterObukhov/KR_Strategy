@@ -294,5 +294,24 @@ namespace KR_Strategy
             Vector vect = new Vector(endCol - startCol, endRow - startRow);
             return (int)vect.Length;
         }
+        public static void WinCheck(Player player1, Player otherPlayer)
+        {
+            bool win = true;
+            foreach (Base playerBase in player1.playerBases)
+            {
+                if (playerBase != null) win = false;
+            }
+            if (win) MessageBox.Show($"{otherPlayer.name} победил!");
+        }
+        public static void ShowPath(int move, int row, int col, Graphics gr)
+        {
+            for(int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+
+                }
+            }
+        }
     }
 }

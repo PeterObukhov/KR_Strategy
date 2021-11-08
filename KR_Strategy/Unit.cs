@@ -111,9 +111,17 @@ namespace KR_Strategy
                     if (unit.hasActed == false)
                     {
                         Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int unitRow, out int unitCol);
-                        if (Field.resourceTiles[unitRow, unitCol] == 1) attacker.gasAmount += 100;
-                        if (Field.resourceTiles[unitRow, unitCol] == 2) attacker.mineralsAmount += 100;
-                        unit.hasActed = true;
+                        if (Field.resourceTiles[unitRow, unitCol] == 1)
+                        {
+                            attacker.gasAmount += 100;
+                            unit.hasActed = true;
+                        }
+                        else if (Field.resourceTiles[unitRow, unitCol] == 2)
+                        {
+                            attacker.mineralsAmount += 100; 
+                            unit.hasActed = true;
+                        }
+                        else MessageBox.Show("В данном месте нет ресурсов для добычи!");
                     }
                     else MessageBox.Show("Этот юнит уже сделал действие в этом ходу!");
                     break;
@@ -167,7 +175,7 @@ namespace KR_Strategy
     }
     class Fighter : AirUnit
     {
-        public Fighter(double dmg = 10, double hp = 100, int mv = 5, int cg = 50, int cm = 20) : base(dmg, hp, mv, cg, cm)
+        public Fighter(double dmg = 50, double hp = 100, int mv = 5, int cg = 50, int cm = 20) : base(dmg, hp, mv, cg, cm)
         {
             damage = 50;
             health = 100;

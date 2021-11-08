@@ -85,18 +85,8 @@ namespace KR_Strategy
             Field.DrawHexGrid(graphics, pen, 0, pictureBox1.ClientSize.Width, 0, pictureBox1.ClientSize.Height, 80);
             Field.DrawUnits(graphics, player1);
             Field.DrawUnits(graphics, player2);
-            bool win = true;
-            foreach(Base playerBase in player1.playerBases)
-            {
-                if (playerBase != null) win = false;
-            }
-            if (win) MessageBox.Show($"{player2.name} победил!");
-            win = true;
-            foreach (Base playerBase in player2.playerBases)
-            {
-                if (playerBase != null) win = false;
-            }
-            if (win) MessageBox.Show($"{player1.name} победил!");
+            Field.WinCheck(player1, player2);
+            Field.WinCheck(player2, player1);
         }
 
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
