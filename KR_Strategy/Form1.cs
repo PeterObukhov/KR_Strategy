@@ -59,6 +59,16 @@ namespace KR_Strategy
             comboBox2.Visible = false;
             label2.Visible = false;
             pictureBox1.Visible = true;
+            label3.Visible = true;
+            label4.Visible = true;
+            label5.Visible = true;
+            label6.Visible = true;
+            label7.Visible = true;
+            label8.Visible = true;
+            label9.Visible = true;
+            label10.Visible = true;
+            button4.Visible = true;
+            button5.Visible = true;
             Field.SetUnit(new Base(), 0, 0, player1);
             Field.SetUnit(new Base(), 3, 8, player2);
             field.CreateField();
@@ -86,11 +96,16 @@ namespace KR_Strategy
         private void button5_Click(object sender, EventArgs e)
         {
             count += 1;
+            button5.Enabled = false;
+            button4.Enabled = true;
+
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
             count += 1;
+            button4.Enabled = false;
+            button5.Enabled = true;
         }
     }
 }

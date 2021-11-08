@@ -11,8 +11,8 @@ namespace KR_Strategy
     class Base : Unit
     {
         public double hp;
-        public int costGas = 700;
-        public int costMinerals = 500;
+        public new int costGas = 700;
+        public new int costMinerals = 500;
         public Base(double dmg = 0, double hp = 200, int mv = 0, int cg = 0, int cm = 0) : base(dmg, hp, mv, cg, cm)
         {
             this.hp = hp;

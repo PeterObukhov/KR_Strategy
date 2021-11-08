@@ -142,22 +142,25 @@
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(49, 412);
+            this.button4.Location = new System.Drawing.Point(45, 427);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(75, 34);
             this.button4.TabIndex = 8;
             this.button4.Text = "Закончить ход";
             this.button4.UseVisualStyleBackColor = true;
+            this.button4.Visible = false;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(681, 412);
+            this.button5.Enabled = false;
+            this.button5.Location = new System.Drawing.Point(684, 427);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(75, 34);
             this.button5.TabIndex = 9;
             this.button5.Text = "Закончить ход";
             this.button5.UseVisualStyleBackColor = true;
+            this.button5.Visible = false;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // label3
@@ -168,6 +171,7 @@
             this.label3.Size = new System.Drawing.Size(63, 13);
             this.label3.TabIndex = 10;
             this.label3.Text = "Минералы:";
+            this.label3.Visible = false;
             // 
             // label4
             // 
@@ -177,6 +181,7 @@
             this.label4.Size = new System.Drawing.Size(13, 13);
             this.label4.TabIndex = 11;
             this.label4.Text = "0";
+            this.label4.Visible = false;
             // 
             // label5
             // 
@@ -186,6 +191,7 @@
             this.label5.Size = new System.Drawing.Size(28, 13);
             this.label5.TabIndex = 12;
             this.label5.Text = "Газ:";
+            this.label5.Visible = false;
             // 
             // label6
             // 
@@ -195,6 +201,7 @@
             this.label6.Size = new System.Drawing.Size(13, 13);
             this.label6.TabIndex = 13;
             this.label6.Text = "0";
+            this.label6.Visible = false;
             // 
             // label7
             // 
@@ -204,6 +211,7 @@
             this.label7.Size = new System.Drawing.Size(63, 13);
             this.label7.TabIndex = 14;
             this.label7.Text = "Минералы:";
+            this.label7.Visible = false;
             // 
             // label8
             // 
@@ -213,6 +221,7 @@
             this.label8.Size = new System.Drawing.Size(13, 13);
             this.label8.TabIndex = 15;
             this.label8.Text = "0";
+            this.label8.Visible = false;
             // 
             // label9
             // 
@@ -222,6 +231,7 @@
             this.label9.Size = new System.Drawing.Size(28, 13);
             this.label9.TabIndex = 16;
             this.label9.Text = "Газ:";
+            this.label9.Visible = false;
             // 
             // label10
             // 
@@ -231,12 +241,13 @@
             this.label10.Size = new System.Drawing.Size(13, 13);
             this.label10.TabIndex = 17;
             this.label10.Text = "0";
+            this.label10.Visible = false;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(768, 447);
+            this.ClientSize = new System.Drawing.Size(772, 468);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.label8);

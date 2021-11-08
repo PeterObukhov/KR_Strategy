@@ -133,7 +133,7 @@ namespace KR_Strategy
                 new PointF(x + width * 0.25f, y + height / 2),
             };
         }
-        private static void DrawTile(int row, int col, float height, Graphics gr)
+        private static void DrawTile(int row, int col, Graphics gr)
         {
             switch(tileTypes[row, col])
             {
