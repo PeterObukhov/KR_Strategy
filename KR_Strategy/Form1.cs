@@ -12,8 +12,8 @@ namespace KR_Strategy
 {
     public partial class Form1 : Form
     {
-        static Player player1 = new Player();
-        static Player player2 = new Player();
+        static Player player1 = new Player("Игрок 1", "Blue");
+        static Player player2 = new Player("Игрок 2", "Red");
         static int count = 0;
         static Field field = new Field();
         public Form1()
@@ -83,7 +83,20 @@ namespace KR_Strategy
             label8.Text = player2.mineralsAmount.ToString();
             label10.Text = player2.gasAmount.ToString();
             Field.DrawHexGrid(graphics, pen, 0, pictureBox1.ClientSize.Width, 0, pictureBox1.ClientSize.Height, 80);
-            Field.DrawUnits(graphics);
+            Field.DrawUnits(graphics, player1);
+            Field.DrawUnits(graphics, player2);
+            bool win = true;
+            foreach(Base playerBase in player1.playerBases)
+            {
+                if (playerBase != null) win = false;
+            }
+            if (win) MessageBox.Show($"{player2.name} победил!");
+            win = true;
+            foreach (Base playerBase in player2.playerBases)
+            {
+                if (playerBase != null) win = false;
+            }
+            if (win) MessageBox.Show($"{player1.name} победил!");
         }
 
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
@@ -98,6 +111,14 @@ namespace KR_Strategy
             count += 1;
             button5.Enabled = false;
             button4.Enabled = true;
+            foreach (Unit unit in player2.playerUnits)
+            {
+                if (unit != null)
+                {
+                    unit.hasActed = false;
+                    unit.hasMoved = false;
+                }
+            }
 
         }
 
@@ -106,6 +127,14 @@ namespace KR_Strategy
             count += 1;
             button4.Enabled = false;
             button5.Enabled = true;
+            foreach (Unit unit in player1.playerUnits) 
+            {
+                if(unit != null)
+                {
+                    unit.hasActed = false;
+                    unit.hasMoved = false;
+                }
+            }
         }
     }
 }

@@ -10,6 +10,8 @@ namespace KR_Strategy
 {
     class Unit
     {
+        public bool hasMoved;
+        public bool hasActed;
         public double damage { get; set; }
         public int move { get; set; }
         public double health { get; set; }
@@ -22,6 +24,8 @@ namespace KR_Strategy
             move = mv;
             costGas = cg;
             costMinerals = cm;
+            hasMoved = false;
+            hasActed = false;
         }
         public virtual int CalcMove(string tile) { return move; }
         public virtual void Attack(Unit target, string tile) { }
@@ -33,76 +37,99 @@ namespace KR_Strategy
             switch (dialogRes)
             {
                 case "Attack":
-                    MouseEventHandler attackClickHandler = null;
-                    attackClickHandler = delegate (object sender, MouseEventArgs secondClick)
+                    if (unit.hasActed == false)
                     {
-                        double dist = Field.GetDistance(firstClick.Location, secondClick.Location);
-                        if (dist <= 1)
+                        MouseEventHandler attackClickHandler = null;
+                        attackClickHandler = delegate (object sender, MouseEventArgs secondClick)
                         {
-                            Field.PointToHex(secondClick.Location.X, secondClick.Location.Y, out int row, out int col);
-                            if(Field.unitTiles[row, col] != null)
+                            double dist = Field.GetDistance(firstClick.Location, secondClick.Location);
+                            if (dist <= 1)
                             {
-                                Unit target = Field.unitTiles[row, col];
-                                Attack(target, tile);
-                                if (target.health <= 0)
+                                Field.PointToHex(secondClick.Location.X, secondClick.Location.Y, out int row, out int col);
+                                if (Field.unitTiles[row, col] != null)
                                 {
-                                    Field.unitTiles[row, col] = null;
-                                    defender.playerUnits[row, col] = null;
+                                    Unit target = Field.unitTiles[row, col];
+                                    Attack(target, tile);
+                                    if (target.health <= 0)
+                                    {
+                                        Field.unitTiles[row, col] = null;
+                                        defender.playerUnits[row, col] = null;
+                                        pictureBox1.Invalidate();
+                                    }
                                 }
-                            }
-                            else if (Field.baseTiles[row, col] != null)
-                            {
-                                Unit target = Field.baseTiles[row, col];
-                                Attack(target, tile);
-                                if (target.health <= 0)
+                                else if (Field.baseTiles[row, col] != null)
                                 {
-                                    Field.baseTiles[row, col] = null;
-                                    defender.playerBases[row, col] = null;
+                                    Unit target = Field.baseTiles[row, col];
+                                    Attack(target, tile);
+                                    if (target.health <= 0)
+                                    {
+                                        Field.baseTiles[row, col] = null;
+                                        defender.playerBases[row, col] = null;
+                                        pictureBox1.Invalidate();
+                                    }
                                 }
+                                unit.hasActed = true;
                             }
-                        }
-                        pictureBox1.MouseClick -= attackClickHandler;
-                    };
-                    pictureBox1.MouseClick += attackClickHandler;
+                            pictureBox1.MouseClick -= attackClickHandler;
+                        };
+                        pictureBox1.MouseClick += attackClickHandler;
+                        unit.hasActed = true;
+                    }
+                    else MessageBox.Show("Этот юнит уже сделал действие в этом ходу!");
                     break;
 
                 case "Move":
-                    int mv = CalcMove("Flat");
-                    MouseEventHandler moveClickHandler = null;
-                    moveClickHandler = delegate (object sender, MouseEventArgs secondClick)
+                    if (unit.hasMoved == false)
                     {
-                        try
+                        int mv = CalcMove("Flat");
+                        MouseEventHandler moveClickHandler = null;
+                        moveClickHandler = delegate (object sender, MouseEventArgs secondClick)
                         {
-                            double dist = Field.GetDistance(firstClick.Location, secondClick.Location);
-                            if (dist <= mv)
+                            try
                             {
-                                Field.PointToHex(secondClick.Location.X, secondClick.Location.Y, out int rowEnd, out int colEnd);
-                                Field.unitTiles[rowEnd, colEnd] = unit;
-                                attacker.playerUnits[rowEnd, colEnd] = unit;
-                                Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int rowStart, out int colStart);
-                                Field.unitTiles[rowStart, colStart] = null;
-                                attacker.playerUnits[rowStart, colStart] = null;
+                                double dist = Field.GetDistance(firstClick.Location, secondClick.Location);
+                                if (dist <= mv)
+                                {
+                                    Field.PointToHex(secondClick.Location.X, secondClick.Location.Y, out int rowEnd, out int colEnd);
+                                    Field.unitTiles[rowEnd, colEnd] = unit;
+                                    attacker.playerUnits[rowEnd, colEnd] = unit;
+                                    Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int rowStart, out int colStart);
+                                    Field.unitTiles[rowStart, colStart] = null;
+                                    attacker.playerUnits[rowStart, colStart] = null;
+                                }
+                                pictureBox1.MouseClick -= moveClickHandler;
                             }
-                            pictureBox1.MouseClick -= moveClickHandler;
-                        }
-                        catch { }
-                    };
-                    pictureBox1.MouseClick += moveClickHandler;
+                            catch { }
+                        };
+                        pictureBox1.MouseClick += moveClickHandler;
+                        unit.hasMoved = true;
+                    }
+                    else MessageBox.Show("Этот юнит уже перемещался в этом ходу!");
                     break;
 
                 case "Dig":
-                    Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int unitRow, out int unitCol);
-                    if(Field.resourceTiles[unitRow, unitCol] == 1) attacker.gasAmount += 100;
-                    if (Field.resourceTiles[unitRow, unitCol] == 2) attacker.mineralsAmount += 100;
+                    if (unit.hasActed == false)
+                    {
+                        Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int unitRow, out int unitCol);
+                        if (Field.resourceTiles[unitRow, unitCol] == 1) attacker.gasAmount += 100;
+                        if (Field.resourceTiles[unitRow, unitCol] == 2) attacker.mineralsAmount += 100;
+                        unit.hasActed = true;
+                    }
+                    else MessageBox.Show("Этот юнит уже сделал действие в этом ходу!");
                     break;
 
                 case "Build":
-                    Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int currRow, out int currCol);
-                    if (Field.resourceTiles[currRow, currCol] == 0 && Field.baseTiles[currRow, currCol] == null)
+                    if (unit.hasActed == false)
                     {
-                        Field.SetUnit(new Base(), currRow, currCol, attacker);
+                        Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int currRow, out int currCol);
+                        if (Field.resourceTiles[currRow, currCol] == 0 && Field.baseTiles[currRow, currCol] == null)
+                        {
+                            Field.SetUnit(new Base(), currRow, currCol, attacker);
+                            unit.hasActed = true;
+                        }
+                        else MessageBox.Show("Невозможно поставить базу");
                     }
-                    else MessageBox.Show("Невозможно поставить базу");
+                    else MessageBox.Show("Этот юнит уже сделал действие в этом ходу!");
                     break;
             }
         }
@@ -128,6 +155,7 @@ namespace KR_Strategy
             if (tile.GetType().Name == "Sea" || tile.GetType().Name == "Desert") tempDamage += 10;
             if (tile.GetType().Name == "River") tempDamage += 20;
             target.health -= tempDamage;
+            MessageBox.Show($"Попадание! Нанесенный урон: {tempDamage}. Оставшиеся жизни цели: {target.health}");
         }
 
         public override int CalcMove(string tile)

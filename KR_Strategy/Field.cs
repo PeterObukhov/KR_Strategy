@@ -46,18 +46,22 @@ namespace KR_Strategy
         public static void FieldClick(MouseEventArgs e, PictureBox pb, Player player1, Field field, Player player2)
         {
             PointToHex(e.X, e.Y, out int row, out int col);
-            if (player1.playerBases[row, col] != null && player1.playerUnits[row, col] != null)
+            try
             {
-                player1.playerUnits[row, col].OnClick(player1.playerUnits[row, col], pb, e, "Flat", player1, player2);
-            }
-            else if (player1.playerBases[row, col] != null) player1.playerBases[row, col].OnClick(new System.Drawing.Point(row, col), player1);
-            else
-            {
-                if (player1.playerUnits[row, col] != null)
+                if (player1.playerBases[row, col] != null && player1.playerUnits[row, col] != null)
                 {
                     player1.playerUnits[row, col].OnClick(player1.playerUnits[row, col], pb, e, "Flat", player1, player2);
                 }
+                else if (player1.playerBases[row, col] != null) player1.playerBases[row, col].OnClick(new System.Drawing.Point(row, col), player1);
+                else
+                {
+                    if (player1.playerUnits[row, col] != null)
+                    {
+                        player1.playerUnits[row, col].OnClick(player1.playerUnits[row, col], pb, e, "Flat", player1, player2);
+                    }
+                }
             }
+            catch { }
         }
         public static void SetUnit(Unit unit, int row, int col, Player player)
         {
@@ -83,19 +87,19 @@ namespace KR_Strategy
                     break;
             }
         }
-        public static void DrawUnits(Graphics gr)
+        public static void DrawUnits(Graphics gr, Player player)
         {
             for(int row = 0; row < 4; row++)
             {
                 for(int col = 0; col < 9; col++)
                 {
-                    if(baseTiles[row, col] != null) DrawImageInPolygon(gr, HexToPoints(row, col), Image.FromFile("base.png"));
-                    if (unitTiles[row, col] != null)
+                    if(player.playerBases[row, col] != null) DrawImageInPolygon(gr, HexToPoints(row, col), Image.FromFile($"base{player.color}.png"));
+                    if (player.playerUnits[row, col] != null)
                     {
                         switch (unitTiles[row, col].GetType().Name)
                         {
                             case "Fighter":
-                                DrawImageInPolygon(gr, HexToPoints(row, col), Image.FromFile("fighter.png"));
+                                DrawImageInPolygon(gr, HexToPoints(row, col), Image.FromFile($"fighter{player.color}.png"));
                                 break;
                         }
                     }
@@ -187,7 +191,7 @@ namespace KR_Strategy
                     // If it fits vertically, draw it.
                     if (points[4].Y <= ymax)
                     {
-                        DrawTile(row, col, height, gr);
+                        DrawTile(row, col, gr);
                         gr.DrawPolygon(pen, points);
                         Hexagons.Add(new PointF(row, col));
                     }
@@ -283,13 +287,12 @@ namespace KR_Strategy
                 col--;
             }
         }
-        public static double GetDistance(System.Drawing.Point start, System.Drawing.Point end)
+        public static int GetDistance(System.Drawing.Point start, System.Drawing.Point end)
         {
-            int startRow, startCol, endRow, endCol;
-            PointToHex(start.X, start.Y, out startRow, out startCol);
-            PointToHex(end.X, end.Y, out endRow, out endCol);
+            PointToHex(start.X, start.Y, out int startRow, out int startCol);
+            PointToHex(end.X, end.Y, out int endRow, out int endCol);
             Vector vect = new Vector(endCol - startCol, endRow - startRow);
-            return vect.Length;
+            return (int)vect.Length;
         }
     }
 }
