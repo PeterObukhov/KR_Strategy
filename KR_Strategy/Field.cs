@@ -17,7 +17,18 @@ namespace KR_Strategy
         public static int[,] resourceTiles = new int[4, 9];
         public static Base[,] baseTiles = new Base[4, 9];
         public static Unit[,] unitTiles = new Unit[4, 9];
+        public static Mine[,] mines = new Mine[4, 9];
         private static List<PointF> Hexagons = new List<PointF>();
+        private static readonly Dictionary<int, string> tiles = new Dictionary<int, string> 
+        { 
+            { 0, "Plain" },
+            { 1, "Forest" },
+            { 2, "Mountain" },
+            { 3, "Sea" },
+            { 4, "Desert" },
+            { 5, "Swamp" },
+            { 6, "River" },
+        };
         Random rnd = new Random();
         public void CreateField()
         {
@@ -25,39 +36,39 @@ namespace KR_Strategy
             {
                 for (int j = 0; j < 9; j++)
                 {
-                    tileTypes[i, j] = rnd.Next(0, 5);
+                    tileTypes[i, j] = rnd.Next(0, 7);
                 }
             }
             for (int i = 0; i < 5; i++)
             {
                 int row = rnd.Next(0, 4);
-                int col = rnd.Next(0, 8);
+                int col = rnd.Next(0, 9);
                 if (baseTiles[row, col] == null && resourceTiles[row, col] == 0) resourceTiles[row, col] = 1;
                 else i -= 1;
             }
             for (int i = 0; i < 3; i++)
             {
                 int row = rnd.Next(0, 4);
-                int col = rnd.Next(0, 8);
+                int col = rnd.Next(0, 9);
                 if (baseTiles[row, col] == null && resourceTiles[row, col] == 0) resourceTiles[row, col] = 2;
                 else i -= 1;
             }
         }
-        public static void FieldClick(MouseEventArgs e, PictureBox pb, Player player1, Field field, Player player2)
+        public static void FieldClick(MouseEventArgs e, PictureBox pb, Player player1, Player player2)
         {
             PointToHex(e.X, e.Y, out int row, out int col);
             try
             {
                 if (player1.playerBases[row, col] != null && player1.playerUnits[row, col] != null)
                 {
-                    player1.playerUnits[row, col].OnClick(player1.playerUnits[row, col], pb, e, "Flat", player1, player2);
+                    player1.playerUnits[row, col].OnClick(player1.playerUnits[row, col], pb, e, tiles[tileTypes[row, col]], player1, player2);
                 }
                 else if (player1.playerBases[row, col] != null) player1.playerBases[row, col].OnClick(new System.Drawing.Point(row, col), player1);
                 else
                 {
                     if (player1.playerUnits[row, col] != null)
                     {
-                        player1.playerUnits[row, col].OnClick(player1.playerUnits[row, col], pb, e, "Flat", player1, player2);
+                        player1.playerUnits[row, col].OnClick(player1.playerUnits[row, col], pb, e, tiles[tileTypes[row, col]], player1, player2);
                     }
                 }
             }
@@ -81,6 +92,9 @@ namespace KR_Strategy
                         else MessageBox.Show("Недостаточно ресурсов!");
                     }
                     break;
+                case "Mine":
+                    mines[row, col] = new Mine();
+                    break;
                 default:
                     unitTiles[row, col] = unit;
                     player.playerUnits[row, col] = unit;
@@ -93,16 +107,9 @@ namespace KR_Strategy
             {
                 for(int col = 0; col < 9; col++)
                 {
-                    if(player.playerBases[row, col] != null) DrawImageInPolygon(gr, HexToPoints(row, col), Image.FromFile($"base{player.color}.png"));
-                    if (player.playerUnits[row, col] != null)
-                    {
-                        switch (player.playerUnits[row, col].GetType().Name)
-                        {
-                            case "Fighter":
-                                DrawImageInPolygon(gr, HexToPoints(row, col), Image.FromFile($"fighter{player.color}.png"));
-                                break;
-                        }
-                    }
+                    if (mines[row, col] != null) DrawImageInPolygon(gr, HexToPoints(row, col), Image.FromFile("mine.png"));
+                    if (player.playerBases[row, col] != null) DrawImageInPolygon(gr, HexToPoints(row, col), Image.FromFile($"base{player.color}.png"));
+                    if (player.playerUnits[row, col] != null) DrawImageInPolygon(gr, HexToPoints(row, col), Image.FromFile($"{player.playerUnits[row, col].GetType().Name}{player.color}.png"));
                 }
             }
         }
@@ -142,19 +149,25 @@ namespace KR_Strategy
             switch(tileTypes[row, col])
             {
                 case 0:
-                    gr.FillPolygon(Brushes.LightBlue, HexToPoints(row, col));
+                    gr.FillPolygon(Brushes.LightGreen, HexToPoints(row, col));
                     break;
                 case 1:
-                    gr.FillPolygon(Brushes.Red, HexToPoints(row, col));
-                    break;
-                case 2:
                     gr.FillPolygon(Brushes.Green, HexToPoints(row, col));
                     break;
+                case 2:
+                    gr.FillPolygon(Brushes.Gray, HexToPoints(row, col));
+                    break;
                 case 3:
-                    gr.FillPolygon(Brushes.Yellow, HexToPoints(row, col));
+                    gr.FillPolygon(Brushes.DarkBlue, HexToPoints(row, col));
                     break;
                 case 4:
-                    gr.FillPolygon(Brushes.Orange, HexToPoints(row, col));
+                    gr.FillPolygon(Brushes.Yellow, HexToPoints(row, col));
+                    break;
+                case 5:
+                    gr.FillPolygon(Brushes.SaddleBrown, HexToPoints(row, col));
+                    break;
+                case 6:
+                    gr.FillPolygon(Brushes.Cyan, HexToPoints(row, col));
                     break;
             }
             switch (resourceTiles[row, col])
@@ -287,6 +300,33 @@ namespace KR_Strategy
                 col--;
             }
         }
+        private System.Drawing.Point ArrayToHexspace(int x, int y)
+        {
+            return new System.Drawing.Point((int)(x - Math.Floor((decimal)(y / 2))), (int)(x + Math.Ceiling((decimal)(y / 2))));
+        }
+        public static int HexDistance(System.Drawing.Point p1, System.Drawing.Point p2)
+        {
+            int ax = p1.X - Floor2(p1.Y);
+            int ay = p1.X + Ceil2(p1.Y);
+            int bx = p2.X - Floor2(p2.Y);
+            int by = p2.X + Ceil2(p2.Y);
+            int dx = bx - ax;
+            int dy = by - ay;
+            if (Math.Sign(dx) == Math.Sign(dy))
+            {
+                return Math.Max(Math.Abs(dx), Math.Abs(dy));
+            }
+            return Math.Abs(dx) + Math.Abs(dy);
+        }
+
+        private static int Floor2(int x)
+        {
+            return ((x >= 0) ? (x >> 1) : (x - 1) / 2);
+        }
+        private static int Ceil2(int x)
+        {
+            return ((x >= 0) ? ((x + 1) >> 1) : x / 2);
+        }
         public static int GetDistance(System.Drawing.Point start, System.Drawing.Point end)
         {
             PointToHex(start.X, start.Y, out int startRow, out int startCol);
@@ -294,10 +334,10 @@ namespace KR_Strategy
             Vector vect = new Vector(endCol - startCol, endRow - startRow);
             return (int)vect.Length;
         }
-        public static void WinCheck(Player player1, Player otherPlayer)
+        public static void WinCheck(Player player, Player otherPlayer)
         {
             bool win = true;
-            foreach (Base playerBase in player1.playerBases)
+            foreach (Base playerBase in player.playerBases)
             {
                 if (playerBase != null) win = false;
             }
@@ -310,14 +350,15 @@ namespace KR_Strategy
                 for (int j = 0; j < 9; j++)
                 {
                     Vector vect = new Vector(row - i, col - j);
-                    int a = (int)vect.Length;
+                    double a = vect.Length;
                     if (a <= move)
                     {
                         PointF[] points = HexToPoints(i, j);
-                        gr.DrawPolygon(new Pen(Color.LightBlue, 3), points);
+                        gr.DrawPolygon(new Pen(Color.Blue, 3), points);
                     }
                 }
             }
         }
+
     }
 }

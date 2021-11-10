@@ -28,9 +28,19 @@ namespace KR_Strategy
                     Fighter nf = new Fighter();
                     if (nf.costMinerals <= player.mineralsAmount && nf.costGas <= player.gasAmount)
                     {
-                        Field.SetUnit(new Fighter(), coordinates.X, coordinates.Y, player);
+                        Field.SetUnit(nf, coordinates.X, coordinates.Y, player);
                         player.mineralsAmount -= nf.costMinerals;
                         player.gasAmount -= nf.costGas;
+                    }
+                    else MessageBox.Show("Недостаточно материалов!");
+                    break;
+                case "Cruiser":
+                    Cruiser nc = new Cruiser();
+                    if (nc.costMinerals <= player.mineralsAmount && nc.costGas <= player.gasAmount)
+                    {
+                        Field.SetUnit(nc, coordinates.X, coordinates.Y, player);
+                        player.mineralsAmount -= nc.costMinerals;
+                        player.gasAmount -= nc.costGas;
                     }
                     else MessageBox.Show("Недостаточно материалов!");
                     break;

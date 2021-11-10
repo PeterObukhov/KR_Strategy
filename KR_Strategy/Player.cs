@@ -15,8 +15,8 @@ namespace KR_Strategy
             this.name = name;
             this.color = color;
         }
-        public int gasAmount = 800;
-        public int mineralsAmount = 600;
+        public int gasAmount = 10000;
+        public int mineralsAmount = 10000;
         public Unit[,] playerUnits = new Unit[4, 9];
         public Base[,] playerBases = new Base[4, 9];
     }

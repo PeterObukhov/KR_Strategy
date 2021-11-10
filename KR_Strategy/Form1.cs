@@ -91,8 +91,8 @@ namespace KR_Strategy
 
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
         {
-            if(count % 2 == 0) Field.FieldClick(e, pictureBox1, player1, field, player2);
-            else Field.FieldClick(e, pictureBox1, player2, field, player1);
+            if(count % 2 == 0) Field.FieldClick(e, pictureBox1, player1, player2);
+            else Field.FieldClick(e, pictureBox1, player2, player1);
             pictureBox1.Invalidate();
         }
 
@@ -126,5 +126,6 @@ namespace KR_Strategy
                 }
             }
         }
+
     }
 }

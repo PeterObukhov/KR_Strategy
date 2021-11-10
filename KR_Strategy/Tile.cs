@@ -6,32 +6,8 @@ using System.Threading.Tasks;
 
 namespace KR_Strategy
 {
-    class Flat
+    class Tile
     {
-
-    }
-    class Forest
-    {
-
-    }
-    class Mountain
-    {
-
-    }
-    class Desert
-    {
-
-    }
-    class Swamp
-    {
-
-    }
-    class River
-    {
-
-    }
-    class Sea
-    {
-
+        
     }
 }
