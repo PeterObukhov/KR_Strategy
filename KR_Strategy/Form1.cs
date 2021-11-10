@@ -74,7 +74,7 @@ namespace KR_Strategy
             field.CreateField();
         }
 
-        private void pictureBox1_Paint(object sender, PaintEventArgs e)
+        public void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
             Graphics graphics = e.Graphics;
             Pen pen = new Pen(Color.Black, 3);
@@ -92,7 +92,7 @@ namespace KR_Strategy
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
         {
             if(count % 2 == 0) Field.FieldClick(e, pictureBox1, player1, field, player2);
-            else Field.FieldClick(e, pictureBox1, player2, field, player2);
+            else Field.FieldClick(e, pictureBox1, player2, field, player1);
             pictureBox1.Invalidate();
         }
 

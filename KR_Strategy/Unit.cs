@@ -79,30 +79,42 @@ namespace KR_Strategy
                     break;
 
                 case "Move":
+                    int mv = CalcMove("Flat");
+                    Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int rowStart, out int colStart);
+                    PaintEventHandler moveHandler = null;
+                    moveHandler = delegate (object sender, PaintEventArgs paint)
+                    {
+                        Field.ShowPath(mv, rowStart, colStart, paint.Graphics);
+                    };
                     if (unit.hasMoved == false)
                     {
-                        int mv = CalcMove("Flat");
+                        pictureBox1.Paint += moveHandler;
                         MouseEventHandler moveClickHandler = null;
                         moveClickHandler = delegate (object sender, MouseEventArgs secondClick)
                         {
                             try
                             {
-                                double dist = Field.GetDistance(firstClick.Location, secondClick.Location);
-                                if (dist <= mv)
+                                Field.PointToHex(secondClick.Location.X, secondClick.Location.Y, out int rowPoint, out int colPoint);
+                                if (Field.unitTiles[rowPoint, colPoint] == null && Field.baseTiles[rowPoint, colPoint] == null)
                                 {
-                                    Field.PointToHex(secondClick.Location.X, secondClick.Location.Y, out int rowEnd, out int colEnd);
-                                    Field.unitTiles[rowEnd, colEnd] = unit;
-                                    attacker.playerUnits[rowEnd, colEnd] = unit;
-                                    Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int rowStart, out int colStart);
-                                    Field.unitTiles[rowStart, colStart] = null;
-                                    attacker.playerUnits[rowStart, colStart] = null;
+                                    double dist = Field.GetDistance(firstClick.Location, secondClick.Location);
+                                    if (dist <= mv)
+                                    {
+                                        Field.PointToHex(secondClick.Location.X, secondClick.Location.Y, out int rowEnd, out int colEnd);
+                                        Field.unitTiles[rowEnd, colEnd] = unit;
+                                        attacker.playerUnits[rowEnd, colEnd] = unit;
+                                        Field.unitTiles[rowStart, colStart] = null;
+                                        attacker.playerUnits[rowStart, colStart] = null;
+                                        unit.hasMoved = true;
+                                    }
                                 }
+                                else MessageBox.Show("Клетка занята!");
                                 pictureBox1.MouseClick -= moveClickHandler;
+                                pictureBox1.Paint -= moveHandler;
                             }
                             catch { }
                         };
                         pictureBox1.MouseClick += moveClickHandler;
-                        unit.hasMoved = true;
                     }
                     else MessageBox.Show("Этот юнит уже перемещался в этом ходу!");
                     break;

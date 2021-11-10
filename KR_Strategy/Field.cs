@@ -96,7 +96,7 @@ namespace KR_Strategy
                     if(player.playerBases[row, col] != null) DrawImageInPolygon(gr, HexToPoints(row, col), Image.FromFile($"base{player.color}.png"));
                     if (player.playerUnits[row, col] != null)
                     {
-                        switch (unitTiles[row, col].GetType().Name)
+                        switch (player.playerUnits[row, col].GetType().Name)
                         {
                             case "Fighter":
                                 DrawImageInPolygon(gr, HexToPoints(row, col), Image.FromFile($"fighter{player.color}.png"));
@@ -309,7 +309,13 @@ namespace KR_Strategy
             {
                 for (int j = 0; j < 9; j++)
                 {
-
+                    Vector vect = new Vector(row - i, col - j);
+                    int a = (int)vect.Length;
+                    if (a <= move)
+                    {
+                        PointF[] points = HexToPoints(i, j);
+                        gr.DrawPolygon(new Pen(Color.LightBlue, 3), points);
+                    }
                 }
             }
         }
