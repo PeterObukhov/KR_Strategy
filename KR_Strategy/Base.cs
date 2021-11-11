@@ -25,26 +25,40 @@ namespace KR_Strategy
             switch (dialAns)
             {
                 case "Fighter":
-                    Fighter nf = new Fighter();
-                    if (nf.costMinerals <= player.mineralsAmount && nf.costGas <= player.gasAmount)
-                    {
-                        Field.SetUnit(nf, coordinates.X, coordinates.Y, player);
-                        player.mineralsAmount -= nf.costMinerals;
-                        player.gasAmount -= nf.costGas;
-                    }
-                    else MessageBox.Show("Недостаточно материалов!");
+                    CreateUnit(new Fighter(), player, coordinates);
                     break;
                 case "Cruiser":
-                    Cruiser nc = new Cruiser();
-                    if (nc.costMinerals <= player.mineralsAmount && nc.costGas <= player.gasAmount)
-                    {
-                        Field.SetUnit(nc, coordinates.X, coordinates.Y, player);
-                        player.mineralsAmount -= nc.costMinerals;
-                        player.gasAmount -= nc.costGas;
-                    }
-                    else MessageBox.Show("Недостаточно материалов!");
+                    CreateUnit(new Cruiser(), player, coordinates);
+                    break;
+                case "Drone":
+                    CreateUnit(new Drone(), player, coordinates);
+                    break;
+                case "Tank":
+                    CreateUnit(new Tank(), player, coordinates);
+                    break;
+                case "Car":
+                    CreateUnit(new Car(), player, coordinates);
+                    break;
+                case "Rocket":
+                    CreateUnit(new RocketLauncher(), player, coordinates);
+                    break;
+                case "Boat":
+                    CreateUnit(new Boat(), player, coordinates);
+                    break;
+                case "Ship":
+                    CreateUnit(new Ship(), player, coordinates);
                     break;
             }
+        }
+        private void CreateUnit(Unit unit, Player player, Point coordinates)
+        {
+            if (unit.costMinerals <= player.mineralsAmount && unit.costGas <= player.gasAmount)
+            {
+                Field.SetUnit(unit, coordinates.X, coordinates.Y, player);
+                player.mineralsAmount -= unit.costMinerals;
+                player.gasAmount -= unit.costGas;
+            }
+            else MessageBox.Show("Недостаточно материалов!");
         }
     }
 }

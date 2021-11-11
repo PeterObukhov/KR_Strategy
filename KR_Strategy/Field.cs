@@ -300,10 +300,6 @@ namespace KR_Strategy
                 col--;
             }
         }
-        private System.Drawing.Point ArrayToHexspace(int x, int y)
-        {
-            return new System.Drawing.Point((int)(x - Math.Floor((decimal)(y / 2))), (int)(x + Math.Ceiling((decimal)(y / 2))));
-        }
         public static int HexDistance(System.Drawing.Point p1, System.Drawing.Point p2)
         {
             int ax = p1.X - Floor2(p1.Y);
@@ -327,13 +323,6 @@ namespace KR_Strategy
         {
             return ((x >= 0) ? ((x + 1) >> 1) : x / 2);
         }
-        public static int GetDistance(System.Drawing.Point start, System.Drawing.Point end)
-        {
-            PointToHex(start.X, start.Y, out int startRow, out int startCol);
-            PointToHex(end.X, end.Y, out int endRow, out int endCol);
-            Vector vect = new Vector(endCol - startCol, endRow - startRow);
-            return (int)vect.Length;
-        }
         public static void WinCheck(Player player, Player otherPlayer)
         {
             bool win = true;
@@ -349,9 +338,7 @@ namespace KR_Strategy
             {
                 for (int j = 0; j < 9; j++)
                 {
-                    Vector vect = new Vector(row - i, col - j);
-                    double a = vect.Length;
-                    if (a <= move)
+                    if (HexDistance(new System.Drawing.Point(row, col), new System.Drawing.Point(i, j)) <= move)
                     {
                         PointF[] points = HexToPoints(i, j);
                         gr.DrawPolygon(new Pen(Color.Blue, 3), points);
