@@ -69,6 +69,8 @@ namespace KR_Strategy
             label10.Visible = true;
             button4.Visible = true;
             button5.Visible = true;
+            button6.Visible = true;
+            button7.Visible = true;
             Field.SetUnit(new Base(), 0, 0, player1);
             Field.SetUnit(new Base(), 3, 8, player2);
             field.CreateField();
@@ -101,6 +103,8 @@ namespace KR_Strategy
             count += 1;
             button5.Enabled = false;
             button4.Enabled = true;
+            button7.Enabled = true;
+            button6.Enabled = false;
             foreach (Unit unit in player2.playerUnits)
             {
                 if (unit != null)
@@ -117,6 +121,8 @@ namespace KR_Strategy
             count += 1;
             button4.Enabled = false;
             button5.Enabled = true;
+            button6.Enabled = true;
+            button7.Enabled = false;
             foreach (Unit unit in player1.playerUnits) 
             {
                 if(unit != null)
@@ -127,5 +133,28 @@ namespace KR_Strategy
             }
         }
 
+        private void button7_Click(object sender, EventArgs e)
+        {
+            for(int row = 0; row < 4; row++)
+            {
+                for (int col = 0; col < 9; col++)
+                {
+                    player1.playerBases[row, col] = null;
+                }
+            }
+            pictureBox1.Invalidate();
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            for (int row = 0; row < 4; row++)
+            {
+                for (int col = 0; col < 9; col++)
+                {
+                    player2.playerBases[row, col] = null;
+                }
+            }
+            pictureBox1.Invalidate();
+        }
     }
 }

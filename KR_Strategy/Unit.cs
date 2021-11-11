@@ -130,11 +130,52 @@ namespace KR_Strategy
             }
             else MessageBox.Show("Этот юнит уже перемещался в этом ходу!");
         }
+        public void DoDig(Unit unit, MouseEventArgs firstClick, Player attacker)
+        {
+            Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int unitRow, out int unitCol);
+            if (Field.resourceTiles[unitRow, unitCol] == 1)
+            {
+                attacker.gasAmount += 100;
+                unit.hasActed = true;
+            }
+            else if (Field.resourceTiles[unitRow, unitCol] == 2)
+            {
+                attacker.mineralsAmount += 100;
+                unit.hasActed = true;
+            }
+            else MessageBox.Show("В данном месте нет ресурсов для добычи!");
+        }
+        public void DoBuild(Unit unit, MouseEventArgs firstClick, Player attacker)
+        {
+            Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int currRow, out int currCol);
+            if (Field.resourceTiles[currRow, currCol] == 0 && Field.baseTiles[currRow, currCol] == null)
+            {
+                Field.SetUnit(new Base(), currRow, currCol, attacker);
+                unit.hasActed = true;
+            }
+            else MessageBox.Show("Невозможно поставить базу");
+        }
+        public void DoMine(Unit unit, MouseEventArgs firstClick, Player attacker)
+        {
+            Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int currRow, out int currCol);
+            Field.SetUnit(new Mine(), currRow, currCol, attacker);
+            unit.hasActed = true;
+        }
         public void OnClick(Unit unit, PictureBox pictureBox1, MouseEventArgs firstClick, string tile, Player attacker, Player defender)
         {
-            UnitDialog ud = new UnitDialog();
-            ud.ShowDialog();
-            string dialogRes = ud.ans;
+            string dialogRes;
+            if (unit.GetType().Name != "Infantry")
+            {
+                UnitDialog ud = new UnitDialog();
+                ud.ShowDialog();
+                dialogRes = ud.ans;
+            }
+            else
+            {
+                InfantryDialog id = new InfantryDialog();
+                id.ShowDialog();
+                dialogRes = id.ans;
+            }
             switch (dialogRes)
             {
                 case "Attack":
@@ -152,18 +193,7 @@ namespace KR_Strategy
                 case "Dig":
                     if (unit.hasActed == false)
                     {
-                        Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int unitRow, out int unitCol);
-                        if (Field.resourceTiles[unitRow, unitCol] == 1)
-                        {
-                            attacker.gasAmount += 100;
-                            unit.hasActed = true;
-                        }
-                        else if (Field.resourceTiles[unitRow, unitCol] == 2)
-                        {
-                            attacker.mineralsAmount += 100; 
-                            unit.hasActed = true;
-                        }
-                        else MessageBox.Show("В данном месте нет ресурсов для добычи!");
+                        DoDig(unit, firstClick, attacker);
                     }
                     else MessageBox.Show("Этот юнит уже сделал действие в этом ходу!");
                     break;
@@ -171,24 +201,25 @@ namespace KR_Strategy
                 case "Build":
                     if (unit.hasActed == false)
                     {
-                        Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int currRow, out int currCol);
-                        if (Field.resourceTiles[currRow, currCol] == 0 && Field.baseTiles[currRow, currCol] == null)
-                        {
-                            Field.SetUnit(new Base(), currRow, currCol, attacker);
-                            unit.hasActed = true;
-                        }
-                        else MessageBox.Show("Невозможно поставить базу");
+                        DoBuild(unit, firstClick, attacker);
                     }
                     else MessageBox.Show("Этот юнит уже сделал действие в этом ходу!");
                     break;
                 case "Mine":
                     if (unit.hasActed == false)
                     {
-                        Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int currRow, out int currCol);
-                        Field.SetUnit(new Mine(), currRow, currCol, attacker);
-                        unit.hasActed = true;
+                        DoMine(unit, firstClick, attacker);
                     }
                     else MessageBox.Show("Этот юнит уже сделал действие в этом ходу!");
+                    break;
+                case "Health":
+                    Infantry.UpgradeHealth(unit, attacker);
+                    break;
+                case "Damage":
+                    Infantry.UpgradeDamage(unit, attacker);
+                    break;
+                case "Moving":
+                    Infantry.UpgradeMove(unit, attacker);
                     break;
             }
         }
@@ -277,6 +308,7 @@ namespace KR_Strategy
             if (airUnits.Contains(target.GetType().Name)) tempDamage += 10;
             if (tile.GetType().Name == "Forest" || tile.GetType().Name == "Mountain") tempDamage += 10;
             target.health -= tempDamage;
+            MessageBox.Show($"Попадание! Нанесенный урон: {tempDamage}. Оставшиеся жизни цели: {target.health}");
         }
 
         public override int CalcMove(string tile)
@@ -341,6 +373,7 @@ namespace KR_Strategy
             if (tile == "Sea") tempDamage += 10;
             if (tile == "River") tempDamage += 20;
             target.health -= tempDamage;
+            MessageBox.Show($"Попадание! Нанесенный урон: {tempDamage}. Оставшиеся жизни цели: {target.health}");
         }
 
         public override int CalcMove(string tile)

@@ -91,5 +91,11 @@ namespace KR_Strategy
             ans = "Ship";
             Close();
         }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            ans = "Infantry";
+            Close();
+        }
     }
 }

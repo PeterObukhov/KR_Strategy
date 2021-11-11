@@ -48,6 +48,9 @@ namespace KR_Strategy
                 case "Ship":
                     CreateUnit(new Ship(), player, coordinates);
                     break;
+                case "Infantry":
+                    CreateUnit(new Infantry(), player, coordinates);
+                    break;
             }
         }
         private void CreateUnit(Unit unit, Player player, Point coordinates)
