@@ -12,8 +12,8 @@ namespace KR_Strategy
 {
     public partial class Form1 : Form
     {
-        static Player player1 = new Player("Игрок 1", "Blue");
-        static Player player2 = new Player("Игрок 2", "Red");
+        static Player player1;
+        static Player player2;
         static int count = 0;
         static Field field = new Field();
         public Form1()
@@ -39,15 +39,27 @@ namespace KR_Strategy
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (comboBox1.SelectedIndex == 1 || comboBox1.SelectedIndex == 2)
+            if (comboBox1.SelectedIndex == 1)
             {
+                player1 = new Player("Player 1", "Blue");
+                player2 = new AI("AI", "Red", 1);
+                comboBox2.Visible = true;
+                label2.Visible = true;
+            }
+            else if (comboBox1.SelectedIndex == 2)
+            {
+                player1 = new AI("AI Blue", "Blue", 1);
+                player2 = new AI("AI Red", "Red", 1);
                 comboBox2.Visible = true;
                 label2.Visible = true;
             }
             else
             {
+                player1 = new Player("Player 1", "Blue");
+                player2 = new Player("Player 2", "Red");
                 comboBox2.Visible = false;
                 label2.Visible = false;
+                button3.Enabled = true;
             }
         }
 
@@ -87,8 +99,22 @@ namespace KR_Strategy
             Field.DrawHexGrid(graphics, pen, 0, pictureBox1.ClientSize.Width, 0, pictureBox1.ClientSize.Height, 80);
             Field.DrawUnits(graphics, player1);
             Field.DrawUnits(graphics, player2);
-            Field.WinCheck(player1, player2);
-            Field.WinCheck(player2, player1);
+            if (Field.WinCheck(player1, player2))
+            {
+                button4.Visible = false;
+                button5.Visible = false;
+                button6.Visible = false;
+                button7.Visible = false;
+                MessageBox.Show($"{player2.name} победил!");
+            }
+            if (Field.WinCheck(player2, player1))
+            {
+                button4.Visible = false;
+                button5.Visible = false;
+                button6.Visible = false;
+                button7.Visible = false;
+                MessageBox.Show($"{player1.name} победил!");
+            }
         }
 
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
@@ -113,6 +139,19 @@ namespace KR_Strategy
                     unit.hasMoved = false;
                 }
             }
+            if (player1.GetType().Name == "AI")
+            {
+                AI.AiTurn(player1, player2, pictureBox1);
+                Timer timer = new Timer();
+                timer.Interval = 500;
+                timer.Start();
+                timer.Tick += (s, ee) =>
+                {
+                    timer.Stop();
+                    button4.PerformClick();
+                };
+                pictureBox1.Invalidate();
+            }
 
         }
 
@@ -130,6 +169,19 @@ namespace KR_Strategy
                     unit.hasActed = false;
                     unit.hasMoved = false;
                 }
+            }
+            if (player2.GetType().Name == "AI")
+            {
+                AI.AiTurn(player2, player1, pictureBox1);
+                Timer timer = new Timer();
+                timer.Interval = 500;
+                timer.Start();
+                timer.Tick += (s, ee) =>
+                {
+                    timer.Stop();
+                    button5.PerformClick();
+                };
+                pictureBox1.Invalidate();
             }
         }
 
@@ -155,6 +207,11 @@ namespace KR_Strategy
                 }
             }
             pictureBox1.Invalidate();
+        }
+
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

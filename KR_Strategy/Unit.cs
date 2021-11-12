@@ -42,7 +42,9 @@ namespace KR_Strategy
                     if (Field.unitTiles[rowEnd, colEnd] != null)
                     {
                         Unit target = Field.unitTiles[rowEnd, colEnd];
+                        double tempHealth = target.health;
                         Attack(target, tile);
+                        MessageBox.Show($"Попадание! Нанесенный урон: {tempHealth - target.health}. Оставшиеся жизни цели: {target.health}");
                         if (target.health <= 0)
                         {
                             Field.unitTiles[rowEnd, colEnd] = null;
@@ -54,7 +56,9 @@ namespace KR_Strategy
                     else if (Field.baseTiles[rowEnd, colEnd] != null)
                     {
                         Unit target = Field.baseTiles[rowEnd, colEnd];
+                        double tempHealth = target.health;
                         Attack(target, tile);
+                        MessageBox.Show($"Попадание! Нанесенный урон: {tempHealth - target.health}. Оставшиеся жизни цели: {target.health}");
                         if (target.health <= 0)
                         {
                             Field.baseTiles[rowEnd, colEnd] = null;
@@ -155,7 +159,7 @@ namespace KR_Strategy
             }
             else MessageBox.Show("Невозможно поставить базу");
         }
-        public void DoMine(Unit unit, MouseEventArgs firstClick, Player attacker)
+        public void PlaceMine(Unit unit, MouseEventArgs firstClick, Player attacker)
         {
             Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int currRow, out int currCol);
             Field.SetUnit(new Mine(), currRow, currCol, attacker);
@@ -208,7 +212,7 @@ namespace KR_Strategy
                 case "Mine":
                     if (unit.hasActed == false)
                     {
-                        DoMine(unit, firstClick, attacker);
+                        PlaceMine(unit, firstClick, attacker);
                     }
                     else MessageBox.Show("Этот юнит уже сделал действие в этом ходу!");
                     break;
@@ -245,7 +249,6 @@ namespace KR_Strategy
             if (tile.GetType().Name == "Sea" || tile.GetType().Name == "Desert") tempDamage += 10;
             if (tile.GetType().Name == "River") tempDamage += 20;
             target.health -= tempDamage;
-            MessageBox.Show($"Попадание! Нанесенный урон: {tempDamage}. Оставшиеся жизни цели: {target.health}");
         }
 
         public override int CalcMove(string tile)
@@ -308,7 +311,6 @@ namespace KR_Strategy
             if (airUnits.Contains(target.GetType().Name)) tempDamage += 10;
             if (tile.GetType().Name == "Forest" || tile.GetType().Name == "Mountain") tempDamage += 10;
             target.health -= tempDamage;
-            MessageBox.Show($"Попадание! Нанесенный урон: {tempDamage}. Оставшиеся жизни цели: {target.health}");
         }
 
         public override int CalcMove(string tile)
@@ -344,7 +346,7 @@ namespace KR_Strategy
     }
     class RocketLauncher : GroundUnit
     {
-        public RocketLauncher(double dmg = 150, double hp = 50, int mv = 2, int cg = 150, int cm = 100) : base(dmg, hp, mv, cg, cm)
+        public RocketLauncher(double dmg = 150, double hp = 50, int mv = 3, int cg = 150, int cm = 100) : base(dmg, hp, mv, cg, cm)
         {
             damage = dmg;
             health = hp;
@@ -373,7 +375,6 @@ namespace KR_Strategy
             if (tile == "Sea") tempDamage += 10;
             if (tile == "River") tempDamage += 20;
             target.health -= tempDamage;
-            MessageBox.Show($"Попадание! Нанесенный урон: {tempDamage}. Оставшиеся жизни цели: {target.health}");
         }
 
         public override int CalcMove(string tile)

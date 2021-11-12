@@ -53,7 +53,7 @@ namespace KR_Strategy
                     break;
             }
         }
-        private void CreateUnit(Unit unit, Player player, Point coordinates)
+        public void CreateUnit(Unit unit, Player player, Point coordinates)
         {
             if (unit.costMinerals <= player.mineralsAmount && unit.costGas <= player.gasAmount)
             {

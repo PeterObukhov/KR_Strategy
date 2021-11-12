@@ -13,13 +13,13 @@ namespace KR_Strategy
     class Field
     {
         private static readonly float height = 80;
-        private static int[,] tileTypes = new int[4, 9];
+        public static int[,] tileTypes = new int[4, 9];
         public static int[,] resourceTiles = new int[4, 9];
         public static Base[,] baseTiles = new Base[4, 9];
         public static Unit[,] unitTiles = new Unit[4, 9];
         public static Mine[,] mines = new Mine[4, 9];
         private static List<PointF> Hexagons = new List<PointF>();
-        private static readonly Dictionary<int, string> tiles = new Dictionary<int, string> 
+        public static readonly Dictionary<int, string> tiles = new Dictionary<int, string> 
         { 
             { 0, "Plain" },
             { 1, "Forest" },
@@ -117,7 +117,7 @@ namespace KR_Strategy
         {
             return (float)(4 * (height / 2 / Math.Sqrt(3)));
         }
-        private static PointF[] HexToPoints(float row, float col)
+        public static PointF[] HexToPoints(float row, float col)
         {
             // Start with the leftmost corner of the upper left hexagon.
             float width = HexWidth();
@@ -323,14 +323,14 @@ namespace KR_Strategy
         {
             return ((x >= 0) ? ((x + 1) >> 1) : x / 2);
         }
-        public static void WinCheck(Player player, Player otherPlayer)
+        public static bool WinCheck(Player player, Player otherPlayer)
         {
             bool win = true;
             foreach (Base playerBase in player.playerBases)
             {
                 if (playerBase != null) win = false;
             }
-            if (win) MessageBox.Show($"{otherPlayer.name} победил!");
+            return win;
         }
         public static void ShowPath(int move, int row, int col, Graphics gr)
         {

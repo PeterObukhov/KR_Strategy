@@ -47,6 +47,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AI.cs" />
     <Compile Include="Base.cs" />
     <Compile Include="BaseDialog.cs">
       <SubType>Form</SubType>
