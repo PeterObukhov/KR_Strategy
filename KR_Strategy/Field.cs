@@ -12,13 +12,21 @@ namespace KR_Strategy
 {
     class Field
     {
+        //Высота шестиугольника
         private static readonly float height = 80;
+        //Массив типов клеток
         public static int[,] tileTypes = new int[4, 9];
+        //Массив клеток с ресурсами
         public static int[,] resourceTiles = new int[4, 9];
+        //Массив баз обоих игроков
         public static Base[,] baseTiles = new Base[4, 9];
+        //Массив юнитов обоих игроков
         public static Unit[,] unitTiles = new Unit[4, 9];
+        //Массив мин
         public static Mine[,] mines = new Mine[4, 9];
+        //Список шестиугольников
         private static List<PointF> Hexagons = new List<PointF>();
+        //Словарь идентификаторов клеток и их названий
         public static readonly Dictionary<int, string> tiles = new Dictionary<int, string> 
         { 
             { 0, "Plain" },
@@ -30,6 +38,7 @@ namespace KR_Strategy
             { 6, "River" },
         };
         Random rnd = new Random();
+        //Заполнение поля случайными клетками и расстановка ресурсов на них
         public void CreateField()
         {
             for (int i = 0; i < 4; i++)
@@ -54,18 +63,23 @@ namespace KR_Strategy
                 else i -= 1;
             }
         }
+        //Обработчик события нажатия на карту
         public static void FieldClick(MouseEventArgs e, PictureBox pb, Player player1, Player player2)
         {
             PointToHex(e.X, e.Y, out int row, out int col);
             try
             {
+                //Если на выбранной клетке одновременно находится юнит и база, обработка нажатия на юнит
                 if (player1.playerBases[row, col] != null && player1.playerUnits[row, col] != null)
                 {
                     player1.playerUnits[row, col].OnClick(player1.playerUnits[row, col], pb, e, tiles[tileTypes[row, col]], player1, player2);
                 }
+                //Если на выбранной клетке находится база, обработка нажатия на базу
                 else if (player1.playerBases[row, col] != null) player1.playerBases[row, col].OnClick(new System.Drawing.Point(row, col), player1);
+                //Если на выбранной клетке находится юнит, обработка нажатия на юнит
                 else
                 {
+                    //Если юнит принадлежит текущему игроку
                     if (player1.playerUnits[row, col] != null)
                     {
                         player1.playerUnits[row, col].OnClick(player1.playerUnits[row, col], pb, e, tiles[tileTypes[row, col]], player1, player2);
@@ -74,17 +88,22 @@ namespace KR_Strategy
             }
             catch { }
         }
+        //Добавление юнита, базы или мины на карту
         public static void SetUnit(Unit unit, int row, int col, Player player)
         {
             switch (unit.GetType().Name)
             {
+                //Добавление базы
                 case "Base":
                     if(baseTiles[row, col] == null)
                     {
                         Base nb = new Base();
+                        //Если у текущего игрока достаточно ресурсов для создания базы
                         if (player.gasAmount >= nb.costGas && player.mineralsAmount >= nb.costMinerals)
                         {
+                            //Добавление базы в массив баз игрока
                             player.playerBases[row, col] = nb;
+                            //Добавление базы в общий массив
                             baseTiles[row, col] = nb;
                             player.gasAmount -= nb.costGas;
                             player.mineralsAmount -= nb.costMinerals;
@@ -92,15 +111,19 @@ namespace KR_Strategy
                         else MessageBox.Show("Недостаточно ресурсов!");
                     }
                     break;
+                //Добавление мины
                 case "Mine":
                     mines[row, col] = new Mine();
                     break;
+                //Добавление юнита
                 default:
                     unitTiles[row, col] = unit;
+                    //Добавление юнита в массив юнитов игрока
                     player.playerUnits[row, col] = unit;
                     break;
             }
         }
+        //Отображение юнитов, баз и мин на карте
         public static void DrawUnits(Graphics gr, Player player)
         {
             for(int row = 0; row < 4; row++)
@@ -113,27 +136,29 @@ namespace KR_Strategy
                 }
             }
         }
+        //Подсчет ширины шестиугольника
         private static float HexWidth()
         {
             return (float)(4 * (height / 2 / Math.Sqrt(3)));
         }
+        //Получение массива точек, образующих шестиугольник на выбранной позиции
         public static PointF[] HexToPoints(float row, float col)
         {
-            // Start with the leftmost corner of the upper left hexagon.
+            //Начать с верхнего левого угла
             float width = HexWidth();
             float y = height / 2;
             float x = 0;
 
-            // Move down the required number of rows.
+            //Сдвинуться вниз на требуемое количество рядов
             y += row * height;
 
-            // If the column is odd, move down half a hex more.
+            //Если столбец нечетный, сдвинуться вниз еще на половину шестиугольника
             if (col % 2 == 1) y += height / 2;
 
-            // Move over for the column number.
+            //Сдвинуться на требуемое количество столбцов
             x += col * (width * 0.75f);
 
-            // Generate the points.
+            //Генерация точек
             return new PointF[]
             {
                 new PointF(x, y),
@@ -144,6 +169,7 @@ namespace KR_Strategy
                 new PointF(x + width * 0.25f, y + height / 2),
             };
         }
+        //Отображение различных типов клетов и ресурсов на них
         private static void DrawTile(int row, int col, Graphics gr)
         {
             switch(tileTypes[row, col])
@@ -180,28 +206,27 @@ namespace KR_Strategy
                     break;
             }
         }
+        //Отображение шестиугольников
         public static void DrawHexGrid(Graphics gr, Pen pen, float xmin, float xmax, float ymin, float ymax, float height)
         {
-            // Loop until a hexagon won't fit.
             for (int row = 0; row < 4; row++)
             {
-                // Get the points for the row's first hexagon.
+                //Получить точки для первого гексагона
                 PointF[] points = HexToPoints(row, 0);
 
-                // If it doesn't fit, we're done.
+                //Если новый гексагон не влезает, остановить отрисовку
                 if (points[4].Y > ymax) break;
 
-                // Draw the row.
+                //Отобразить строку
                 for (int col = 0; col < 10; col++)
                 {
-                    // Get the points for the row's next hexagon.
+                    //Получить точки для следующего гексагона в строке
                     points = HexToPoints(row, col);
 
-                    // If it doesn't fit horizontally,
-                    // we're done with this row.
+                    //Если не влезает горизонтально, перейти к следующей строке
                     if (points[3].X > xmax) break;
 
-                    // If it fits vertically, draw it.
+                    //Если влезает вертикально, отрисовать гексагон
                     if (points[4].Y <= ymax)
                     {
                         DrawTile(row, col, gr);
@@ -211,6 +236,7 @@ namespace KR_Strategy
                 }
             }
         }
+        //Отобразить изображение в клетке
         private static void DrawImageInPolygon(Graphics gr, PointF[] points, Image image)
         {
             float wid = HexWidth();
@@ -218,19 +244,18 @@ namespace KR_Strategy
             float cx = (points[0].X + points[3].X) / 2f;
             float cy = (points[5].Y + points[1].Y) / 2f;
 
-            // Calculate the scale needed to make
-            // the image fill the polygon's bounds.
+            //Вычислить масштаб, чтобы заполнить клетку выбранным изображением
             float xscale = wid / image.Width;
             float yscale = hgt / image.Height;
             float scale = Math.Max(xscale, yscale);
 
-            // Calculate the image's scaled size.
+            //Вычислить размер изображения после масштабирования
             float imgWidth = image.Width * scale;
             float imgHeight = image.Height * scale;
             float rx = imgWidth / 2f;
             float ry = imgHeight / 2f;
 
-            // Find the source rectangle and destination points.
+            //Найти нужный гексагон и точки назначения
             RectangleF src_rect = new RectangleF(0, 0, image.Width, image.Height);
             PointF[] dest_points =
             {
@@ -239,17 +264,17 @@ namespace KR_Strategy
                 new PointF(cx - rx,  cy + ry),
             };
 
-            // Clip the drawing area to the polygon and draw the image.
+            //Отобразить изображение в выбранном шестиугольнике
             GraphicsPath path = new GraphicsPath();
             path.AddPolygon(points);
             GraphicsState state = gr.Save();
-            //gr.SetClip(path);   // Comment out to not clip.
             gr.DrawImage(image, dest_points, src_rect, GraphicsUnit.Pixel);
             gr.Restore(state);
         }
+        //Получить координаты гексагона, к которому принадлежит точка
         public static void PointToHex(float x, float y, out int row, out int col)
         {
-            // Find the test rectangle containing the point.
+            //Найти тестовый шестиугольник, к которому принадлежит точка
             float width = HexWidth();
             col = (int)(x / (width * 0.75f));
 
@@ -258,13 +283,12 @@ namespace KR_Strategy
             else
                 row = (int)Math.Floor((y - height / 2) / height);
 
-            // Find the test area.
+            //Найти тестовую зону
             float testx = col * width * 0.75f;
             float testy = row * height;
             if (col % 2 != 0) testy += height / 2;
 
-            // See if the point is above or
-            // below the test hexagon on the left.
+            // Проверить, если точка выше или ниже шестиугольника слева
             bool is_above = false, is_below = false;
             float dx = x - testx;
             if (dx < width / 4)
@@ -272,23 +296,23 @@ namespace KR_Strategy
                 float dy = y - (testy + height / 2);
                 if (dx < 0.001)
                 {
-                    // The point is on the left edge of the test rectangle.
+                    //Точка на левой грани тестового шестиугольника
                     if (dy < 0) is_above = true;
                     if (dy > 0) is_below = true;
                 }
                 else if (dy < 0)
                 {
-                    // See if the point is above the test hexagon.
+                    //Точка выше тестового шестиугольника
                     if (-dy / dx > Math.Sqrt(3)) is_above = true;
                 }
                 else
                 {
-                    // See if the point is below the test hexagon.
+                    //Точка ниже тестового шестиугольника
                     if (dy / dx > Math.Sqrt(3)) is_below = true;
                 }
             }
 
-            // Adjust the row and column if necessary.
+            //Подстроить ряд и строку при необходимости
             if (is_above)
             {
                 if (col % 2 == 0) row--;
@@ -300,6 +324,7 @@ namespace KR_Strategy
                 col--;
             }
         }
+        //Алгоритм подсчета расстояния между двумя выбранными шестиугольниками
         public static int HexDistance(System.Drawing.Point p1, System.Drawing.Point p2)
         {
             int ax = p1.X - Floor2(p1.Y);
@@ -314,7 +339,6 @@ namespace KR_Strategy
             }
             return Math.Abs(dx) + Math.Abs(dy);
         }
-
         private static int Floor2(int x)
         {
             return ((x >= 0) ? (x >> 1) : (x - 1) / 2);
@@ -323,15 +347,20 @@ namespace KR_Strategy
         {
             return ((x >= 0) ? ((x + 1) >> 1) : x / 2);
         }
+
+        //Проверка победы
         public static bool WinCheck(Player player, Player otherPlayer)
         {
             bool win = true;
+            //Если у игрока нет баз, он проиграл
             foreach (Base playerBase in player.playerBases)
             {
                 if (playerBase != null) win = false;
             }
             return win;
         }
+
+        //Отобразить радиус перемещения выбранного юнита из текущей клетки
         public static void ShowPath(int move, int row, int col, Graphics gr)
         {
             for(int i = 0; i < 4; i++)
