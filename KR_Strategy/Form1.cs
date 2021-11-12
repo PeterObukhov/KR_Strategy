@@ -45,6 +45,7 @@ namespace KR_Strategy
                 player2 = new AI("AI", "Red", 1);
                 comboBox2.Visible = true;
                 label2.Visible = true;
+                button3.Enabled = false;
             }
             else if (comboBox1.SelectedIndex == 2)
             {
@@ -52,6 +53,7 @@ namespace KR_Strategy
                 player2 = new AI("AI Red", "Red", 1);
                 comboBox2.Visible = true;
                 label2.Visible = true;
+                button3.Enabled = false;
             }
             else
             {
@@ -61,6 +63,38 @@ namespace KR_Strategy
                 label2.Visible = false;
                 button3.Enabled = true;
             }
+        }
+
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (comboBox2.SelectedIndex)
+            {
+                case 0:
+                    if(comboBox1.SelectedIndex == 1) player2 = new AI("AI", "Red", 1);
+                    if(comboBox1.SelectedIndex == 2)
+                    {
+                        player1 = new AI("AI Blue", "Blue", 1);
+                        player2 = new AI("AI Red", "Red", 1);
+                    }
+                    break;
+                case 1:
+                    if (comboBox1.SelectedIndex == 1) player2 = new AI("AI", "Red", 2);
+                    if (comboBox1.SelectedIndex == 2)
+                    {
+                        player1 = new AI("AI Blue", "Blue", 2);
+                        player2 = new AI("AI Red", "Red", 2);
+                    }
+                    break;
+                case 3:
+                    if (comboBox1.SelectedIndex == 1) player2 = new AI("AI", "Red", 3);
+                    if (comboBox1.SelectedIndex == 2)
+                    {
+                        player1 = new AI("AI Blue", "Blue", 3);
+                        player2 = new AI("AI Red", "Red", 3);
+                    }
+                    break;
+            }
+            button3.Enabled = true;
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -209,9 +243,10 @@ namespace KR_Strategy
             pictureBox1.Invalidate();
         }
 
-        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        private void button8_Click(object sender, EventArgs e)
         {
-
+            HintDialog hd = new HintDialog();
+            hd.Show();
         }
     }
 }

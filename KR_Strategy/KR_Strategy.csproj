@@ -62,6 +62,12 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="HintDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HintDialog.Designer.cs">
+      <DependentUpon>HintDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Infantry.cs" />
     <Compile Include="InfantryDialog.cs">
       <SubType>Form</SubType>
@@ -85,6 +91,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HintDialog.resx">
+      <DependentUpon>HintDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="InfantryDialog.resx">
       <DependentUpon>InfantryDialog.cs</DependentUpon>

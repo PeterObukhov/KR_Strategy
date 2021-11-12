@@ -31,13 +31,20 @@ namespace KR_Strategy
         public virtual void Attack(Unit target, string tile) { }
         public void DoAttack(Unit unit, PictureBox pictureBox1, MouseEventArgs firstClick, string tile, Player defender) 
         {
+            Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int rowStart, out int colStart);
+            PaintEventHandler attackPaintHandler = null;
+            attackPaintHandler = delegate (object sender, PaintEventArgs paint)
+            {
+                Field.ShowPath(1, rowStart, colStart, paint.Graphics);
+            };
+            pictureBox1.Paint += attackPaintHandler;
+
             MouseEventHandler attackClickHandler = null;
             attackClickHandler = delegate (object sender, MouseEventArgs secondClick)
             {
-                Field.PointToHex(firstClick.Location.X, secondClick.Location.Y, out int rowStart, out int colStart);
                 Field.PointToHex(secondClick.Location.X, secondClick.Location.Y, out int rowEnd, out int colEnd);
                 double dist = Field.HexDistance(new System.Drawing.Point(rowStart, colStart), new System.Drawing.Point(rowEnd, colEnd));
-                if (dist <= 1)
+                if (dist <= 1 && dist != 0)
                 {
                     if (Field.unitTiles[rowEnd, colEnd] != null)
                     {
@@ -79,6 +86,7 @@ namespace KR_Strategy
                         unit.hasActed = true;
                     }
                 }
+                pictureBox1.Paint -= attackPaintHandler;
                 pictureBox1.MouseClick -= attackClickHandler;
             };
             pictureBox1.MouseClick += attackClickHandler;
@@ -111,6 +119,18 @@ namespace KR_Strategy
                                 Field.unitTiles[rowStart, colStart] = null;
                                 attacker.playerUnits[rowStart, colStart] = null;
                                 unit.hasMoved = true;
+                                if (Field.tiles[Field.tileTypes[rowEnd, colEnd]] == "Sea" &&
+                                (attacker.playerUnits[rowEnd, colEnd].GetType().Name != "Ship" ||
+                                attacker.playerUnits[rowEnd, colEnd].GetType().Name != "Boat" ||
+                                attacker.playerUnits[rowEnd, colEnd].GetType().Name != "Fighter" ||
+                                attacker.playerUnits[rowEnd, colEnd].GetType().Name != "Cruiser" ||
+                                attacker.playerUnits[rowEnd, colEnd].GetType().Name != "Drone"))
+                                {
+                                    attacker.playerUnits[rowEnd, colEnd] = null;
+                                    Field.unitTiles[rowEnd, colEnd] = null;
+                                    MessageBox.Show("Юнит утонул!");
+                                    pictureBox1.Invalidate();
+                                }
                                 if (Field.mines[rowEnd, colEnd] != null)
                                 {
                                     Field.mines[rowEnd, colEnd].MineAttack(unit);
@@ -316,7 +336,7 @@ namespace KR_Strategy
         public override int CalcMove(string tile)
         {
             if (tile == "Plain") return move + 1;
-            if (tile == "Mountain" || tile.GetType().Name == "Forest") return move - 1;
+            if (tile == "Mountain" || tile == "Forest" || tile == "Swamp") return move - 1;
             if (tile == "River") return move - 2;
             if (tile == "Sea") return 0;
             return move;
@@ -380,6 +400,7 @@ namespace KR_Strategy
         public override int CalcMove(string tile)
         {
             if (tile == "Sea" || tile == "River") return move;
+            if (tile == "Swamp") return move - 1;
             else return 0;
         }
     }

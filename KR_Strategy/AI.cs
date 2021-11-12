@@ -133,15 +133,28 @@ namespace KR_Strategy
                 ai.playerUnits[i, j].hasActed = true;
             }
         }
-        static Unit ChooseUnit(Player ai)
+        static Unit ChooseUnit(Player ai, int row, int col)
         {
-            Unit[] allUnits = new Unit[] { new Fighter(), new Cruiser(), new Drone(), new Tank(), new Car(), new RocketLauncher(), new Infantry() };
+            Unit[] ground = new Unit[] { new Fighter(), new Cruiser(), new Drone(), new Tank(), new Car(), new RocketLauncher(), new Infantry() };
+            Unit[] water = new Unit[] { new Fighter(), new Cruiser(), new Drone(), new Boat(), new Ship() };
             List<Unit> allowedUnits = new List<Unit>();
             Random rnd = new Random();
-            for (int i = 0; i < 7; i++)
+            string tile = Field.tiles[Field.tileTypes[row, col]];
+            if (tile == "Sea")
             {
-                Unit pick = allUnits[i];
-                if (ai.gasAmount >= pick.costGas && ai.mineralsAmount >= pick.costMinerals) allowedUnits.Add(pick);
+                for (int i = 0; i < 5; i++)
+                {
+                    Unit pick = water[i];
+                    if (ai.gasAmount >= pick.costGas && ai.mineralsAmount >= pick.costMinerals) allowedUnits.Add(pick);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 7; i++)
+                {
+                    Unit pick = ground[i];
+                    if (ai.gasAmount >= pick.costGas && ai.mineralsAmount >= pick.costMinerals) allowedUnits.Add(pick);
+                }
             }
             return allowedUnits[rnd.Next(0, allowedUnits.Count)];
         }
@@ -200,7 +213,7 @@ namespace KR_Strategy
                     {
                         try
                         {
-                            ai.playerBases[row, col].CreateUnit(ChooseUnit(ai), ai, new Point(row, col));
+                            ai.playerBases[row, col].CreateUnit(ChooseUnit(ai, row, col), ai, new Point(row, col));
                         }
                         catch { }
                     }
