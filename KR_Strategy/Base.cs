@@ -8,6 +8,7 @@ using System.Windows.Forms;
 
 namespace KR_Strategy
 {
+    //Класс базы наследует класс Unit для корректной работы метода Attack, где целью является база
     class Base : Unit
     {
         //Здоровье базы
@@ -16,7 +17,7 @@ namespace KR_Strategy
         public new int costGas = 700;
         //Стоимость базы в минералах
         public new int costMinerals = 500;
-        public Base(double dmg = 0, double hp = 200, int mv = 0, int cg = 0, int cm = 0) : base(dmg, hp, mv, cg, cm)
+        public Base(double dmg = 0, double hp = 200, int mv = 0, int ar = 0, int cg = 0, int cm = 0) : base(dmg, hp, mv, ar, cg, cm)
         {
             this.hp = hp;
         }

@@ -19,7 +19,7 @@ namespace KR_Strategy
             aggressiveness = _aggressiveness;
         }
         //Получение списка координат клеток, доступных юниту для перемещения
-        static public List<Point> FindCells(int move, int row, int col)
+        static public List<Point> FindCells(Player ai, int move, int row, int col)
         {
             List<Point> avaliablePoints = new List<Point>();
             for (int i = 0; i < 4; i++)
@@ -28,7 +28,21 @@ namespace KR_Strategy
                 {
                     if (Field.HexDistance(new System.Drawing.Point(row, col), new System.Drawing.Point(i, j)) <= move)
                     {
-                        if (Field.unitTiles[i, j] == null && Field.baseTiles[i, j] == null && Field.tiles[Field.tileTypes[i, j]] != "Sea") avaliablePoints.Add(new Point(i, j));
+                        //Если юнит наземный, то клетки с морем не добавляются в массив доступных клеток
+                        if (Field.tiles[Field.tileTypes[i, j]] == "Sea" &&
+                                (ai.playerUnits[row, col].GetType().Name == "Tank" ||
+                                ai.playerUnits[row, col].GetType().Name == "Infantry" ||
+                                ai.playerUnits[row, col].GetType().Name == "RocketLauncher" ||
+                                ai.playerUnits[row, col].GetType().Name == "Car"))
+                        { }
+                        //Если юнит морской, то клетки с землей не добавляются в массив доступных клеток
+                        else if ((Field.tiles[Field.tileTypes[i, j]] != "Sea" &&
+                                Field.tiles[Field.tileTypes[row, col]] != "River" &&
+                                Field.tiles[Field.tileTypes[row, col]] != "Swamp") &&
+                                (ai.playerUnits[row, col].GetType().Name == "Ship" ||
+                                ai.playerUnits[row, col].GetType().Name == "Boat"))
+                        { }
+                        else if (Field.unitTiles[i, j] == null && Field.baseTiles[i, j] == null) avaliablePoints.Add(new Point(i, j));
                     }
                 }
             }
@@ -43,7 +57,7 @@ namespace KR_Strategy
             {
                 for (int j = 0; j < 9; j++)
                 {
-                    if (Field.HexDistance(new System.Drawing.Point(row, col), new System.Drawing.Point(i, j)) == 1)
+                    if (Field.HexDistance(new System.Drawing.Point(row, col), new System.Drawing.Point(i, j)) <= ai.playerUnits[row, col].attackRange)
                     {
                         //Если юнит или база принадлежит врагу
                         if ((Field.unitTiles[i, j] != null || Field.baseTiles[i, j] != null) && ai.playerBases[i, j] == null && ai.playerUnits[i, j] == null) enemyUnits.Add(new Point(i, j));
@@ -61,7 +75,7 @@ namespace KR_Strategy
             if (ai.playerUnits[i, j] != null && ai.playerUnits[i, j].CalcMove(tile) != 0 && ai.playerUnits[i, j].hasMoved == false)
             {
                 Random rnd = new Random();
-                List<Point> choice = FindCells(ai.playerUnits[i, j].CalcMove(tile), i, j);
+                List<Point> choice = FindCells(ai, ai.playerUnits[i, j].CalcMove(tile), i, j);
                 //Если есть клетки, доступные для перемещения
                 if (choice.Count != 0)
                 {
@@ -75,16 +89,6 @@ namespace KR_Strategy
                     ai.playerUnits[i, j] = null;
                     Field.unitTiles[i, j] = null;
                     ai.playerUnits[temp.X, temp.Y].hasMoved = true;
-                    //Если наземный юнит переместился на морскую клетку, он утонул
-                    if (Field.tiles[Field.tileTypes[temp.X, temp.Y]] == "Sea" &&
-                        (ai.playerUnits[temp.X, temp.Y].GetType().Name != "Ship" ||
-                        ai.playerUnits[temp.X, temp.Y].GetType().Name != "Boat" ||
-                        ai.playerUnits[temp.X, temp.Y].GetType().Name != "Fighter" ||
-                        ai.playerUnits[temp.X, temp.Y].GetType().Name != "Cruiser" ||
-                        ai.playerUnits[temp.X, temp.Y].GetType().Name != "Drone"))
-                    {
-                        ai.playerUnits[temp.X, temp.Y] = null;
-                    }
                 }
             }
         }
@@ -193,7 +197,7 @@ namespace KR_Strategy
                     {
                         float moveChance = 0;
                         //Если юниту есть куда переместиться, генерация шанса на перемещение
-                        if(FindCells(ai.playerUnits[row, col].CalcMove(Field.tiles[Field.tileTypes[row, col]]), row, col).Count != 0)
+                        if(FindCells(ai, ai.playerUnits[row, col].CalcMove(Field.tiles[Field.tileTypes[row, col]]), row, col).Count != 0)
                         {
                             moveChance = rnd.Next(100);
                         }

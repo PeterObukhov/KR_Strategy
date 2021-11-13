@@ -16,22 +16,25 @@ namespace KR_Strategy
         //Совершал ли юнит в этом ходу действие
         public bool hasActed;
         //Урон юнита
-        public double damage { get; set; }
+        public double damage;
         //Перемещение юнита
-        public int move { get; set; }
+        public int move;
         //Здоровье юнита
-        public double health { get; set; }
+        public double health;
         //Стоимость юнита в газе 
-        public int costGas { get; set; }
+        public int costGas;
         //Стоимость юнита в минералах 
-        public int costMinerals { get; set; }
-        public Unit(double dmg, double hp, int mv, int cg, int cm)
+        public int costMinerals;
+        //Дальность атаки юнтов 
+        public int attackRange;
+        public Unit(double dmg, double hp, int mv, int ar, int cg, int cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
             costGas = cg;
             costMinerals = cm;
+            attackRange = ar;
             //Задержка на один ход после создания юнита
             hasMoved = true;
             hasActed = true;
@@ -45,10 +48,10 @@ namespace KR_Strategy
         {
             Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int rowStart, out int colStart);
             PaintEventHandler attackPaintHandler = null;
-            //Отображение радиуса атаки в одну клетку для выбранного юнита
+            //Отображение радиуса атаки для выбранного юнита
             attackPaintHandler = delegate (object sender, PaintEventArgs paint)
             {
-                Field.ShowPath(1, rowStart, colStart, paint.Graphics);
+                Field.ShowPath(unit.attackRange, rowStart, colStart, paint.Graphics);
             };
             pictureBox1.Paint += attackPaintHandler;
             
@@ -59,7 +62,7 @@ namespace KR_Strategy
                 //Получение координат в массиве для атакуемого юнита
                 Field.PointToHex(secondClick.Location.X, secondClick.Location.Y, out int rowEnd, out int colEnd);
                 double dist = Field.HexDistance(new System.Drawing.Point(rowStart, colStart), new System.Drawing.Point(rowEnd, colEnd));
-                if (dist <= 1 && dist != 0)
+                if (dist <= unit.attackRange && dist != 0)
                 {
                     //Если атака на юнит
                     if (Field.unitTiles[rowEnd, colEnd] != null)
@@ -89,7 +92,6 @@ namespace KR_Strategy
                         {
                             Field.baseTiles[rowEnd, colEnd] = null;
                             defender.playerBases[rowEnd, colEnd] = null;
-                            pictureBox1.Invalidate();
                         }
                         unit.hasActed = true;
                     }
@@ -101,11 +103,11 @@ namespace KR_Strategy
                         if (target.health <= 0)
                         {
                             Field.mines[rowEnd, colEnd] = null;
-                            pictureBox1.Invalidate();
                         }
                         unit.hasActed = true;
                     }
                 }
+                pictureBox1.Invalidate();
                 pictureBox1.Paint -= attackPaintHandler;
                 pictureBox1.MouseClick -= attackClickHandler;
             };
@@ -146,15 +148,26 @@ namespace KR_Strategy
                                 unit.hasMoved = true;
                                 //Если наземный юнит переместился в клетку с морем, то он моментально погибает
                                 if (Field.tiles[Field.tileTypes[rowEnd, colEnd]] == "Sea" &&
-                                (attacker.playerUnits[rowEnd, colEnd].GetType().Name != "Ship" ||
-                                attacker.playerUnits[rowEnd, colEnd].GetType().Name != "Boat" ||
-                                attacker.playerUnits[rowEnd, colEnd].GetType().Name != "Fighter" ||
-                                attacker.playerUnits[rowEnd, colEnd].GetType().Name != "Cruiser" ||
-                                attacker.playerUnits[rowEnd, colEnd].GetType().Name != "Drone"))
+                                (attacker.playerUnits[rowEnd, colEnd].GetType().Name == "Tank" ||
+                                attacker.playerUnits[rowEnd, colEnd].GetType().Name == "Infantry" ||
+                                attacker.playerUnits[rowEnd, colEnd].GetType().Name == "RocketLauncher" ||
+                                attacker.playerUnits[rowEnd, colEnd].GetType().Name == "Car"))
                                 {
                                     attacker.playerUnits[rowEnd, colEnd] = null;
                                     Field.unitTiles[rowEnd, colEnd] = null;
                                     MessageBox.Show("Юнит утонул!");
+                                    pictureBox1.Invalidate();
+                                }
+                                //Если водный юнит переместился в клетку без воды, то он моментально погибает
+                                else if ((Field.tiles[Field.tileTypes[rowEnd, colEnd]] != "Sea" ||
+                                Field.tiles[Field.tileTypes[rowEnd, colEnd]] != "River" ||
+                                Field.tiles[Field.tileTypes[rowEnd, colEnd]] != "Swamp") &&
+                                (attacker.playerUnits[rowEnd, colEnd].GetType().Name == "Ship" ||
+                                attacker.playerUnits[rowEnd, colEnd].GetType().Name == "Boat"))
+                                {
+                                    attacker.playerUnits[rowEnd, colEnd] = null;
+                                    Field.unitTiles[rowEnd, colEnd] = null;
+                                    MessageBox.Show("Юнит сел на мель!");
                                     pictureBox1.Invalidate();
                                 }
                                 //Если юнит переместился на клетку с миной, то он получает урон
@@ -296,11 +309,12 @@ namespace KR_Strategy
         private string[] groundUnits = new string[3] { "Car", "Tank", "RocketLauncher" };
         private string[] waterUnits = new string[2] { "Ship", "Boat" };
         private string[] airUnits = new string[3] { "Fighter", "Cruiser", "Drone" };
-        public AirUnit(double dmg, double hp, int mv, int cg, int cm) : base(dmg, hp, mv, cg, cm)
+        public AirUnit(double dmg, double hp, int mv, int ar, int cg, int cm) : base(dmg, hp, mv, ar, cg, cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
+            attackRange = ar;
             costGas = cg;
             costMinerals = cm;
         }
@@ -323,11 +337,12 @@ namespace KR_Strategy
     //Класс истребителя
     class Fighter : AirUnit
     {
-        public Fighter(double dmg = 50, double hp = 100, int mv = 5, int cg = 50, int cm = 20) : base(dmg, hp, mv, cg, cm)
+        public Fighter(double dmg = 50, double hp = 100, int mv = 5, int ar = 1, int cg = 50, int cm = 20) : base(dmg, hp, mv, ar, cg, cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
+            attackRange = ar;
             costGas = cg;
             costMinerals = cm;
         }
@@ -335,11 +350,12 @@ namespace KR_Strategy
     //Класс крейсера
     class Cruiser : AirUnit
     {
-        public Cruiser(double dmg = 80, double hp = 150, int mv = 2, int cg = 150, int cm = 100) : base(dmg, hp, mv, cg, cm)
+        public Cruiser(double dmg = 80, double hp = 150, int mv = 2, int ar = 2, int cg = 150, int cm = 100) : base(dmg, hp, mv, ar, cg, cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
+            attackRange = ar;
             costGas = cg;
             costMinerals = cm;
         }
@@ -347,11 +363,12 @@ namespace KR_Strategy
     //Класс дрона
     class Drone : AirUnit
     {
-        public Drone(double dmg = 40, double hp = 50, int mv = 3, int cg = 40, int cm = 10) : base(dmg, hp, mv, cg, cm)
+        public Drone(double dmg = 40, double hp = 50, int mv = 3, int ar = 1, int cg = 40, int cm = 10) : base(dmg, hp, mv, ar, cg, cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
+            attackRange = ar;
             costGas = cg;
             costMinerals = cm;
         }
@@ -359,11 +376,12 @@ namespace KR_Strategy
     //Класс наземеых юнитов
     class GroundUnit : Unit
     {
-        public GroundUnit(double dmg, double hp, int mv, int cg, int cm) : base(dmg, hp, mv, cg, cm)
+        public GroundUnit(double dmg, double hp, int mv, int ar, int cg, int cm) : base(dmg, hp, mv, ar, cg, cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
+            attackRange = ar;
             costGas = cg;
             costMinerals = cm;
         }
@@ -390,11 +408,12 @@ namespace KR_Strategy
     //Класс танка
     class Tank : GroundUnit
     {
-        public Tank(double dmg = 60, double hp = 200, int mv = 3, int cg = 200, int cm = 100) : base(dmg, hp, mv, cg, cm)
+        public Tank(double dmg = 60, double hp = 200, int mv = 3, int ar = 2, int cg = 200, int cm = 100) : base(dmg, hp, mv, ar, cg, cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
+            attackRange = ar;
             costGas = cg;
             costMinerals = cm;
         }
@@ -402,11 +421,12 @@ namespace KR_Strategy
     //Класс боевой машины
     class Car : GroundUnit
     {
-        public Car(double dmg = 30, double hp = 50, int mv = 4, int cg = 70, int cm = 10) : base(dmg, hp, mv, cg, cm)
+        public Car(double dmg = 30, double hp = 50, int mv = 4, int ar = 1, int cg = 70, int cm = 10) : base(dmg, hp, mv, ar, cg, cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
+            attackRange = ar;
             costGas = cg;
             costMinerals = cm;
         }
@@ -414,11 +434,12 @@ namespace KR_Strategy
     //Класс ракетной установки
     class RocketLauncher : GroundUnit
     {
-        public RocketLauncher(double dmg = 150, double hp = 50, int mv = 3, int cg = 150, int cm = 100) : base(dmg, hp, mv, cg, cm)
+        public RocketLauncher(double dmg = 150, double hp = 50, int mv = 3, int ar = 3, int cg = 150, int cm = 100) : base(dmg, hp, mv, ar, cg, cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
+            attackRange = ar;
             costGas = cg;
             costMinerals = cm;
         }
@@ -426,11 +447,12 @@ namespace KR_Strategy
     //Класс водных юнитов
     class WaterUnit : Unit
     {
-        public WaterUnit(double dmg, double hp, int mv, int cg, int cm) : base(dmg, hp, mv, cg, cm)
+        public WaterUnit(double dmg, double hp, int mv, int ar, int cg, int cm) : base(dmg, hp, mv, ar, cg, cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
+            attackRange = ar;
             costGas = cg;
             costMinerals = cm;
         }
@@ -456,11 +478,12 @@ namespace KR_Strategy
     //Класс лодки
     class Boat : WaterUnit
     {
-        public Boat(double dmg = 100, double hp = 50, int mv = 4, int cg = 70, int cm = 10) : base(dmg, hp, mv, cg, cm)
+        public Boat(double dmg = 100, double hp = 50, int mv = 4, int ar = 1, int cg = 70, int cm = 10) : base(dmg, hp, mv, ar, cg, cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
+            attackRange = ar;
             costGas = cg;
             costMinerals = cm;
         }
@@ -468,11 +491,12 @@ namespace KR_Strategy
     //Класс корабля
     class Ship : WaterUnit
     {
-        public Ship(double dmg = 120, double hp = 200, int mv = 3, int cg = 300, int cm = 200) : base(dmg, hp, mv, cg, cm)
+        public Ship(double dmg = 120, double hp = 200, int mv = 3, int ar = 3, int cg = 300, int cm = 200) : base(dmg, hp, mv, ar, cg, cm)
         {
             damage = dmg;
             health = hp;
             move = mv;
+            attackRange = ar;
             costGas = cg;
             costMinerals = cm;
         }
