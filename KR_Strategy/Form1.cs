@@ -150,12 +150,12 @@ namespace KR_Strategy
             label8.Text = player2.mineralsAmount.ToString();
             label10.Text = player2.gasAmount.ToString();
             //Отрисовка сетки шестиугольникова
-            Field.DrawHexGrid(graphics, pen, 0, pictureBox1.ClientSize.Width, 0, pictureBox1.ClientSize.Height, 80);
+            Field.DrawHexGrid(graphics, pen, pictureBox1.ClientSize.Width, pictureBox1.ClientSize.Height);
             //Отображения баз и юнитов обоих игроков
             Field.DrawUnits(graphics, player1);
             Field.DrawUnits(graphics, player2);
             //Проверка победы второго игрока
-            if (Field.WinCheck(player1, player2))
+            if (player1.WinCheck())
             {
                 button4.Visible = false;
                 button5.Visible = false;
@@ -164,7 +164,7 @@ namespace KR_Strategy
                 MessageBox.Show($"{player2.name} победил!");
             }
             //Проверка победы первого игрока
-            if (Field.WinCheck(player2, player1))
+            if (player2.WinCheck())
             {
                 button4.Visible = false;
                 button5.Visible = false;

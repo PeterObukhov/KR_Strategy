@@ -60,7 +60,8 @@ namespace KR_Strategy
                     if (Field.HexDistance(new System.Drawing.Point(row, col), new System.Drawing.Point(i, j)) <= ai.playerUnits[row, col].attackRange)
                     {
                         //Если юнит или база принадлежит врагу
-                        if ((Field.unitTiles[i, j] != null || Field.baseTiles[i, j] != null) && ai.playerBases[i, j] == null && ai.playerUnits[i, j] == null) enemyUnits.Add(new Point(i, j));
+                        if ((Field.unitTiles[i, j] != null || Field.baseTiles[i, j] != null) 
+                            && ai.playerBases[i, j] == null && ai.playerUnits[i, j] == null) enemyUnits.Add(new Point(i, j));
                     }
                 }
             }
@@ -68,7 +69,7 @@ namespace KR_Strategy
         }
 
         //Перемещение юнита
-        static void MoveUnits(Player ai, int i, int j)
+        static void MoveUnit(Player ai, int i, int j)
         {
             string tile = Field.tiles[Field.tileTypes[i, j]];
             //Если на клетке присутсвует юнит, его перемещение не равно нулю, и он не двигался
@@ -231,7 +232,7 @@ namespace KR_Strategy
                         if (moveChance == Math.Max(Math.Max(moveChance, attackChance), Math.Max(digChance, baseChance)))
                         {
                             //Если шанс на перемещение больше всех остальных, осуществление перемещения на случайную клетку
-                            MoveUnits(ai, row, col);
+                            MoveUnit(ai, row, col);
                         }
                         else if (digChance == Math.Max(Math.Max(moveChance, attackChance), Math.Max(digChance, baseChance)))
                         {

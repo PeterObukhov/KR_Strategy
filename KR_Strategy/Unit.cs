@@ -192,7 +192,7 @@ namespace KR_Strategy
                 };
                 pictureBox1.MouseClick += moveClickHandler;
             }
-            else MessageBox.Show("Этот юнит уже перемещался в этом ходу!");
+            else MessageBox.Show("Этот юнит не может перемещаться на этом ходу");
         }
         //Метод добычи ресурсов
         public void DoDig(Unit unit, MouseEventArgs firstClick, Player attacker)
@@ -257,7 +257,7 @@ namespace KR_Strategy
                     {
                         DoAttack(unit, pictureBox1, firstClick, tile, defender);
                     }
-                    else MessageBox.Show("Этот юнит уже сделал действие в этом ходу!");
+                    else MessageBox.Show("Этот юнит не может совершить действие на этом ходу");
                     break;
 
                 case "Move":
@@ -269,7 +269,7 @@ namespace KR_Strategy
                     {
                         DoDig(unit, firstClick, attacker);
                     }
-                    else MessageBox.Show("Этот юнит уже сделал действие в этом ходу!");
+                    else MessageBox.Show("Этот юнит не может совершить действие на этом ходу");
                     break;
 
                 case "Build":
@@ -277,7 +277,7 @@ namespace KR_Strategy
                     {
                         DoBuild(unit, firstClick, attacker);
                     }
-                    else MessageBox.Show("Этот юнит уже сделал действие в этом ходу!");
+                    else MessageBox.Show("Этот юнит не может совершить действие на этом ходу");
                     break;
 
                 case "Mine":
@@ -285,7 +285,7 @@ namespace KR_Strategy
                     {
                         PlaceMine(unit, firstClick, attacker);
                     }
-                    else MessageBox.Show("Этот юнит уже сделал действие в этом ходу!");
+                    else MessageBox.Show("Этот юнит не может совершить действие на этом ходу");
                     break;
 
                 case "Health":

@@ -207,7 +207,7 @@ namespace KR_Strategy
             }
         }
         //Отображение шестиугольников
-        public static void DrawHexGrid(Graphics gr, Pen pen, float xmin, float xmax, float ymin, float ymax, float height)
+        public static void DrawHexGrid(Graphics gr, Pen pen, float xmax, float ymax)
         {
             for (int row = 0; row < 4; row++)
             {
@@ -349,7 +349,7 @@ namespace KR_Strategy
         }
 
         //Проверка победы
-        public static bool WinCheck(Player player, Player otherPlayer)
+        public static bool WinCheck(Player player)
         {
             bool win = true;
             //Если у игрока нет баз, он проиграл

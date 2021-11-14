@@ -24,5 +24,16 @@ namespace KR_Strategy
         public Unit[,] playerUnits = new Unit[4, 9];
         //Массив баз игрока
         public Base[,] playerBases = new Base[4, 9];
+        //Проверка победы
+        public bool WinCheck()
+        {
+            bool win = true;
+            //Если у игрока нет баз, он проиграл
+            foreach (Base playerBase in playerBases)
+            {
+                if (playerBase != null) win = false;
+            }
+            return win;
+        }
     }
 }
