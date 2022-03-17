@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using System.Windows.Forms;
 
 namespace KR_Strategy
@@ -11,6 +6,10 @@ namespace KR_Strategy
     //Базовый класс всех юнитов
     class Unit
     {
+
+        protected string[] groundUnits = new string[] { "Car", "Tank", "RocketLauncher" };
+        protected string[] waterUnits = new string[] { "Ship", "Boat" };
+        protected string[] airUnits = new string[] { "Fighter", "Cruiser", "Drone" };
         //Перемещался ли юнит в этом ходу
         public bool hasMoved;
         //Совершал ли юнит в этом ходу действие
@@ -44,7 +43,7 @@ namespace KR_Strategy
         //Атака с уроном, зависящим от клетки
         public virtual void Attack(Unit target, string tile) { }
         //Осуществление атаки на выбранный юнит, базу или мину
-        public void DoAttack(Unit unit, PictureBox pictureBox1, MouseEventArgs firstClick, string tile, Player defender) 
+        public void DoAttack(Unit unit, PictureBox pictureBox1, MouseEventArgs firstClick, string tile, Player otherPlayer) 
         {
             Field.PointToHex(firstClick.Location.X, firstClick.Location.Y, out int rowStart, out int colStart);
             PaintEventHandler attackPaintHandler = null;
@@ -76,7 +75,7 @@ namespace KR_Strategy
                         if (target.health <= 0)
                         {
                             Field.unitTiles[rowEnd, colEnd] = null;
-                            defender.playerUnits[rowEnd, colEnd] = null;
+                            otherPlayer.playerUnits[rowEnd, colEnd] = null;
                             pictureBox1.Invalidate();
                         }
                         unit.hasActed = true;
@@ -91,7 +90,7 @@ namespace KR_Strategy
                         if (target.health <= 0)
                         {
                             Field.baseTiles[rowEnd, colEnd] = null;
-                            defender.playerBases[rowEnd, colEnd] = null;
+                            otherPlayer.playerBases[rowEnd, colEnd] = null;
                         }
                         unit.hasActed = true;
                     }
@@ -306,9 +305,6 @@ namespace KR_Strategy
     //Класс летающих юнитов
     class AirUnit : Unit
     {
-        private string[] groundUnits = new string[3] { "Car", "Tank", "RocketLauncher" };
-        private string[] waterUnits = new string[2] { "Ship", "Boat" };
-        private string[] airUnits = new string[3] { "Fighter", "Cruiser", "Drone" };
         public AirUnit(double dmg, double hp, int mv, int ar, int cg, int cm) : base(dmg, hp, mv, ar, cg, cm)
         {
             damage = dmg;
@@ -385,9 +381,6 @@ namespace KR_Strategy
             costGas = cg;
             costMinerals = cm;
         }
-        private string[] groundUnits = new string[3] { "Car", "Tank", "RocketLauncher" };
-        private string[] waterUnits = new string[2] { "Ship", "Boat" };
-        private string[] airUnits = new string[3] { "Fighter", "Cruiser", "Drone" };
         public override void Attack(Unit target, string tile)
         {
             double tempDamage = damage;
@@ -456,9 +449,6 @@ namespace KR_Strategy
             costGas = cg;
             costMinerals = cm;
         }
-        private string[] groundUnits = new string[3] { "Car", "Tank", "RocketLauncher" };
-        private string[] waterUnits = new string[2] { "Ship", "Boat" };
-        private string[] airUnits = new string[3] { "Fighter", "Cruiser", "Drone" };
         public override void Attack(Unit target, string tile)
         {
             double tempDamage = damage;
